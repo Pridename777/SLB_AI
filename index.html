@@ -124,9 +124,9 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
     return {app:'모바일 현황', at:at,
       members:[{name:'팀원 가',title:'책임',memo:'교육, 조직문화'},{name:'팀원 나',title:'책임',memo:'평가'},{name:'팀원 다',title:'선임',memo:'급여, 평가'},{name:'팀원 라',title:'선임',memo:'급여, 교육'},{name:'팀원 마',title:'주임',memo:'채용'}],
       cards:[
-        {id:'s1',no:'HR-0412',title:'리더십 과정 운영 안내문',cat:'교육·육성',stage:'approval',owner:'팀원 가',due:f(-2),next:'교육 일정 확정 후 안내문 발송'},
+        {id:'s1',no:'HR-0412',title:'리더십 과정 운영 안내문',cat:'교육·육성',stage:'approval',owner:'팀원 가',collab:['팀원 라'],due:f(-2),next:'교육 일정 확정 후 안내문 발송'},
         {id:'s2',no:'HR-0415',title:'하반기 평가 일정 공지',cat:'평가·보상',stage:'writing',owner:'팀원 나',due:f(2),next:'평가 기간과 제출처 확인'},
-        {id:'s3',no:'HR-0418',title:'급여 기준 점검 회신',cat:'급여',stage:'review',owner:'팀원 다',due:f(9),next:'수당 기준 조항 대조'},
+        {id:'s3',no:'HR-0418',title:'급여 기준 점검 회신',cat:'급여',stage:'review',owner:'팀원 다',collab:['팀원 라','팀원 나'],due:f(9),next:'수당 기준 조항 대조'},
         {id:'s4',no:'HR-0420',title:'신입 교육 계획',cat:'교육·육성',stage:'intake',owner:'팀원 라',due:f(15),next:'대상자와 교육 기간 확인'},
         {id:'s5',no:'HR-0421',title:'생산직 채용공고 초안',cat:'채용',stage:'writing',owner:'팀원 마',due:f(4),next:'모집 요강과 근무 조건 정리'},
         {id:'s6',no:'HR-0409',title:'법정교육 이수 현황 취합',cat:'교육·육성',stage:'done',owner:'팀원 라',due:f(-6),doneAt:f(-5),next:''}
@@ -155,11 +155,14 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
     if(n <= 3) return '<span class="due soon">D-' + n + '</span>';
     return '<span class="due">' + esc(c.due.slice(5).replace('-', '/')) + '</span>';
   }
-  function row(c, noOwner){
-    return '<div class="row"><div class="body"><div class="t">' + esc(c.title) + '</div><div class="m">' + (noOwner ? '' : '<span class="who">' + esc(c.owner || '담당 미지정') + '</span> · ') + esc(c.cat) + ' · ' + esc(STAGE_NAME[c.stage] || c.stage) + (c.no ? ' · ' + esc(c.no) : '') + '</div>' + (c.next && c.stage !== 'done' ? '<div class="n"><i>다음</i>' + esc(c.next) + '</div>' : '') + '</div>' + dueChip(c) + '</div>';
+  function colab(c){ return (c.collab || []).filter(function(n){ return n && n !== c.owner; }); }
+  function row(c, forMember){
+    var who = forMember == null ? '<span class="who">' + esc(c.owner || '담당 미지정') + '</span>' + (colab(c).length ? ' + ' + esc(colab(c).join(', ')) : '') + ' · '
+      : (c.owner === forMember ? '' : '<span class="who">함께</span> · 담당 ' + esc(c.owner || '미지정') + ' · ');
+    return '<div class="row"><div class="body"><div class="t">' + esc(c.title) + '</div><div class="m">' + who + esc(c.cat) + ' · ' + esc(STAGE_NAME[c.stage] || c.stage) + (c.no ? ' · ' + esc(c.no) : '') + '</div>' + (c.next && c.stage !== 'done' ? '<div class="n"><i>다음</i>' + esc(c.next) + '</div>' : '') + '</div>' + dueChip(c) + '</div>';
   }
   function byDue(a, b){ var x = a.due || '9999', y = b.due || '9999'; return x < y ? -1 : x > y ? 1 : 0; }
-  function sec(title, arr, noOwner){ return '<section class="sec"><h2>' + esc(title) + ' <em>' + arr.length + '</em></h2><div class="list">' + (arr.length ? arr.map(function(c){ return row(c, noOwner); }).join('') : '<div class="empty">해당 업무가 없습니다.</div>') + '</div></section>'; }
+  function sec(title, arr){ return '<section class="sec"><h2>' + esc(title) + ' <em>' + arr.length + '</em></h2><div class="list">' + (arr.length ? arr.map(function(c){ return row(c); }).join('') : '<div class="empty">해당 업무가 없습니다.</div>') + '</div></section>'; }
 
   function stampHTML(){
     var at = String(D.at || ''), txt = at ? (+at.slice(5, 7)) + '월 ' + (+at.slice(8, 10)) + '일 ' + at.slice(11, 16) : '';
@@ -192,13 +195,15 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
       open.forEach(function(c){ var o = c.owner || '담당 미지정'; if(names.indexOf(o) < 0) names.push(o); });
       html = names.map(function(n){
         var m = D.members.filter(function(x){ return x.name === n; })[0] || {name:n,title:'',memo:''};
-        var mine = open.filter(function(c){ return (c.owner || '담당 미지정') === n; }).sort(byDue);
-        var lt = mine.filter(function(c){ return c.due && dleft(c.due) < 0; }).length;
-        return '<details class="mem"' + (mine.length ? ' open' : '') + '><summary><div class="nm"><b>' + esc(n) + '</b> ' + esc(m.title) + '<span>' + esc(m.memo) + '</span></div><div class="cnt">진행 ' + mine.length + (lt ? ' · <em>지연 ' + lt + '</em>' : '') + '</div></summary>' +
-          (mine.length ? mine.map(function(c){ return row(c, true); }).join('') : '<div class="empty">진행 중인 업무가 없습니다.</div>') + '</details>';
+        var own = open.filter(function(c){ return (c.owner || '담당 미지정') === n; }).sort(byDue);
+        var wth = open.filter(function(c){ return c.owner !== n && colab(c).indexOf(n) >= 0; }).sort(byDue);
+        var mine = own.concat(wth);
+        var lt = own.filter(function(c){ return c.due && dleft(c.due) < 0; }).length;
+        return '<details class="mem"' + (mine.length ? ' open' : '') + '><summary><div class="nm"><b>' + esc(n) + '</b> ' + esc(m.title) + '<span>' + esc(m.memo) + '</span></div><div class="cnt">진행 ' + own.length + (wth.length ? ' · 함께 ' + wth.length : '') + (lt ? ' · <em>지연 ' + lt + '</em>' : '') + '</div></summary>' +
+          (mine.length ? mine.map(function(c){ return row(c, n); }).join('') : '<div class="empty">진행 중인 업무가 없습니다.</div>') + '</details>';
       }).join('');
     } else {
-      var list = cards.filter(function(c){ return (!stageF || c.stage === stageF) && (!q || (c.title + ' ' + (c.owner || '') + ' ' + c.cat + ' ' + (c.no || '') + ' ' + (c.next || '')).toLowerCase().indexOf(q.toLowerCase()) >= 0); });
+      var list = cards.filter(function(c){ return (!stageF || c.stage === stageF) && (!q || (c.title + ' ' + (c.owner || '') + ' ' + colab(c).join(' ') + ' ' + c.cat + ' ' + (c.no || '') + ' ' + (c.next || '')).toLowerCase().indexOf(q.toLowerCase()) >= 0); });
       list.sort(function(a, b){ return (a.stage === 'done') - (b.stage === 'done') || byDue(a, b); });
       html = '<input class="search" id="q" type="search" placeholder="업무, 담당자, 번호 검색" value="' + esc(q) + '" aria-label="검색">' +
         '<div class="chips" id="chips">' + [''].concat(STAGE_ORDER).map(function(s){ return '<button data-st="' + s + '" aria-pressed="' + String(stageF === s) + '">' + (s ? STAGE_NAME[s] : '전체') + '</button>'; }).join('') + '</div>' +
