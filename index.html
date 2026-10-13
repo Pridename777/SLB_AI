@@ -55,6 +55,17 @@ main{display:flex;flex-direction:column;gap:18px;padding-block:14px}
 .row .m{font-size:12.5px;color:var(--sub);margin-top:2px;overflow-wrap:anywhere}
 .row .n{font-size:13px;margin-top:5px;overflow-wrap:anywhere}
 .row .n i{font-style:normal;color:var(--accent);font-weight:700;margin-right:4px}
+.row.tap{cursor:pointer}
+.row .brief{font-size:13px;margin-top:5px;color:var(--fg);overflow-wrap:anywhere}
+.row .brief i{font-style:normal;color:var(--sub);font-weight:700;margin-right:4px}
+.row .det{display:none;margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);font-size:13.5px;overflow-wrap:anywhere}
+.row.open .det{display:block}
+.det h3{font-size:12px;color:var(--sub);margin:10px 0 2px;font-weight:700}
+.det h3:first-child{margin-top:0}
+.det p{margin:0;white-space:pre-wrap}
+.det ul{margin:0;padding-left:18px}
+.det li.dn{color:var(--sub);text-decoration:line-through}
+.det .u{color:var(--sub);font-variant-numeric:tabular-nums;margin-right:6px}
 .due{flex:none;font-size:12px;font-weight:700;border-radius:999px;padding:2px 9px;background:var(--accent-weak);color:var(--accent);white-space:nowrap;font-variant-numeric:tabular-nums}
 .due.late{background:var(--late-weak);color:var(--late)} .due.soon{background:var(--warn-weak);color:var(--warn)} .due.done{background:var(--ok-weak);color:var(--ok)} .due.none{background:var(--line);color:var(--sub)}
 .who{font-weight:700;color:var(--fg)}
@@ -86,9 +97,9 @@ details.mem .row:first-child{border-top:0}
 .sample{display:inline-block;background:var(--warn-weak);color:var(--warn);font-weight:700;font-size:12px;border-radius:999px;padding:1px 9px}
 input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 </style>
-
 </head>
 <body>
+
 <div class="wrap">
   <header>
     <h1>인사팀 업무 현황</h1>
@@ -99,6 +110,7 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
         <button role="tab" id="tb-urgent" aria-selected="true" data-tab="urgent">급한 일</button>
         <button role="tab" id="tb-team" aria-selected="false" data-tab="team">팀원별</button>
         <button role="tab" id="tb-all" aria-selected="false" data-tab="all">전체</button>
+        <button role="tab" id="tb-rec" aria-selected="false" data-tab="rec">기록용</button>
       </div>
     </div>
   </header>
@@ -124,12 +136,16 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
     return {app:'모바일 현황', at:at,
       members:[{name:'팀원 가',title:'책임',memo:'교육, 조직문화'},{name:'팀원 나',title:'책임',memo:'평가'},{name:'팀원 다',title:'선임',memo:'급여, 평가'},{name:'팀원 라',title:'선임',memo:'급여, 교육'},{name:'팀원 마',title:'주임',memo:'채용'}],
       cards:[
-        {id:'s1',no:'HR-0412',title:'리더십 과정 운영 안내문',cat:'교육·육성',stage:'approval',owner:'팀원 가',collab:['팀원 라'],due:f(-2),next:'교육 일정 확정 후 안내문 발송'},
-        {id:'s2',no:'HR-0415',title:'하반기 평가 일정 공지',cat:'평가·보상',stage:'writing',owner:'팀원 나',due:f(2),next:'평가 기간과 제출처 확인'},
-        {id:'s3',no:'HR-0418',title:'급여 기준 점검 회신',cat:'급여',stage:'review',owner:'팀원 다',collab:['팀원 라','팀원 나'],due:f(9),next:'수당 기준 조항 대조'},
-        {id:'s4',no:'HR-0420',title:'신입 교육 계획',cat:'교육·육성',stage:'intake',owner:'팀원 라',due:f(15),next:'대상자와 교육 기간 확인'},
-        {id:'s5',no:'HR-0421',title:'생산직 채용공고 초안',cat:'채용',stage:'writing',owner:'팀원 마',due:f(4),next:'모집 요강과 근무 조건 정리'},
-        {id:'s6',no:'HR-0409',title:'법정교육 이수 현황 취합',cat:'교육·육성',stage:'done',owner:'팀원 라',due:f(-6),doneAt:f(-5),next:''}
+        {id:'s1',no:'HR-0412',title:'리더십 과정 운영 안내문',cat:'교육·육성',stage:'approval',owner:'팀원 가',collab:['팀원 라'],due:f(-2),next:'교육 일정 확정 후 안내문 발송',req:'리더 대상 교육 과정의 운영 일정과 참석 안내문을 만들어 주세요.',prog:'안내문 초안 작성 완료. 일정 확정을 기다리는 중.',todo:[{t:'일정 확정',d:false},{t:'안내문 발송',d:false}],ups:[{at:f(-5),t:'안내문 초안 작성'},{at:f(-3),t:'팀장 검토 요청'}]},
+        {id:'s2',no:'HR-0415',title:'하반기 평가 일정 공지',cat:'평가·보상',stage:'writing',owner:'팀원 나',due:f(2),next:'평가 기간과 제출처 확인',req:'하반기 평가 일정을 전 직원에게 공지해야 합니다.',prog:'공지 문구 초안 작성 중.',ups:[{at:f(-1),t:'일정표 수령'}]},
+        {id:'s3',no:'HR-0418',title:'급여 기준 점검 회신',cat:'급여',stage:'review',owner:'팀원 다',collab:['팀원 라','팀원 나'],due:f(9),next:'수당 기준 조항 대조',hidden:1},
+        {id:'s4',no:'HR-0420',title:'신입 교육 계획',cat:'교육·육성',stage:'intake',owner:'팀원 라',due:f(15),next:'대상자와 교육 기간 확인',req:'신입 사원 교육 계획안 작성.',prog:'접수 완료. 대상자 확인 전.'},
+        {id:'s5',no:'HR-0421',title:'생산직 채용공고 초안',cat:'채용',stage:'writing',owner:'팀원 마',due:f(4),next:'모집 요강과 근무 조건 정리',req:'생산직 채용공고 초안.',prog:'모집 요강 정리 중.'},
+        {id:'s6',no:'HR-0409',title:'법정교육 이수 현황 취합',cat:'교육·육성',stage:'done',owner:'팀원 라',due:f(-6),doneAt:f(-5),next:'',req:'법정교육 이수 현황 취합.',done:{sum:'부서별 이수 현황을 취합해 보고함.',to:'팀장',notes:''}}
+      ],
+      records:[
+        {id:'r1',no:'REC-1',title:'사내 교육 문의 답변',cat:'교육·육성',date:f(-3),requester:'생산팀',handler:'팀원 가',outcome:'교육 신청 방법을 안내함.',notes:'다음 분기 일정은 추후 공지 예정.',kw:'교육, 신청'},
+        {id:'r2',no:'REC-2',title:'급여 관련 문의',cat:'급여',date:f(-8),requester:'',handler:'팀원 나',hidden:1}
       ]};
   }
   function valid(o){ return o && typeof o === 'object' && Array.isArray(o.cards) && Array.isArray(o.members); }
@@ -156,10 +172,35 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
     return '<span class="due">' + esc(c.due.slice(5).replace('-', '/')) + '</span>';
   }
   function colab(c){ return (c.collab || []).filter(function(n){ return n && n !== c.owner; }); }
+  function clip(t, n){ t = String(t || '').replace(/\s+/g, ' ').trim(); return t.length > n ? t.slice(0, n - 1) + '…' : t; }
+  function lastProg(c){ var u = c.ups && c.ups.length ? c.ups[c.ups.length - 1] : null; return c.prog || (u ? u.t : '') || ''; }
+  function hasDet(c){ return !!(c.req || c.prog || (c.ups && c.ups.length) || (c.todo && c.todo.length) || c.done || c.nextAll); }
+  function part(t, v){ return v ? '<h3>' + t + '</h3><p>' + esc(v) + '</p>' : ''; }
+  function detail(c){
+    var h = '';
+    if(c.handler !== undefined && c.date !== undefined){
+      h += part('요청자', c.requester) + part('처리한 사람', c.handler) + part('처리 결과', c.outcome) + part('메모', c.notes) + part('키워드', c.kw);
+      return h || '<p>내용이 없습니다.</p>';
+    }
+    h += part('요청자', c.requester) + part('요청 내용', c.req) + part('진행 상황', c.prog);
+    if(c.todo && c.todo.length) h += '<h3>할 일</h3><ul>' + c.todo.map(function(x){ return '<li' + (x.d ? ' class="dn"' : '') + '>' + esc(x.t) + '</li>'; }).join('') + '</ul>';
+    h += part('다음 할 일', c.nextAll);
+    if(c.ups && c.ups.length) h += '<h3>진행 기록</h3><ul>' + c.ups.slice().reverse().map(function(u){ return '<li><span class="u">' + esc((u.at || '').slice(5).replace('-', '/')) + '</span>' + esc(u.t) + '</li>'; }).join('') + '</ul>';
+    if(c.done) h += part('완료 내용', c.done.sum) + part('전달 대상', c.done.to) + part('비고', c.done.notes);
+    return h || '<p>내용이 없습니다.</p>';
+  }
   function row(c, forMember){
     var who = forMember == null ? '<span class="who">' + esc(c.owner || '담당 미지정') + '</span>' + (colab(c).length ? ' + ' + esc(colab(c).join(', ')) : '') + ' · '
       : (c.owner === forMember ? '' : '<span class="who">함께</span> · 담당 ' + esc(c.owner || '미지정') + ' · ');
-    return '<div class="row"><div class="body"><div class="t">' + esc(c.title) + '</div><div class="m">' + who + esc(c.cat) + ' · ' + esc(STAGE_NAME[c.stage] || c.stage) + (c.no ? ' · ' + esc(c.no) : '') + '</div>' + (c.next && c.stage !== 'done' ? '<div class="n"><i>다음</i>' + esc(c.next) + '</div>' : '') + '</div>' + dueChip(c) + '</div>';
+    var brief = (c.req ? '<div class="brief"><i>내용</i>' + esc(clip(c.req, 70)) + '</div>' : '') + (lastProg(c) && c.stage !== 'done' ? '<div class="brief"><i>진행</i>' + esc(clip(lastProg(c), 80)) + '</div>' : '') + (c.done && c.done.sum ? '<div class="brief"><i>결과</i>' + esc(clip(c.done.sum, 80)) + '</div>' : '');
+    var tap = hasDet(c) || c.hidden;
+    return '<div class="row' + (tap ? ' tap' : '') + '" data-id="' + esc(c.id) + '"><div class="body"><div class="t">' + esc(c.title) + '</div><div class="m">' + who + esc(c.cat) + ' · ' + esc(STAGE_NAME[c.stage] || c.stage) + (c.no ? ' · ' + esc(c.no) : '') + '</div>' + brief + (c.next && c.stage !== 'done' ? '<div class="n"><i>다음</i>' + esc(c.next) + '</div>' : '') +
+      (tap ? '<div class="det">' + (c.hidden ? '<p>급여·평가 업무라서 제목만 보입니다. 노트북 프로그램 설정에서 바꿀 수 있습니다.</p>' : detail(c)) + '</div>' : '') + '</div>' + dueChip(c) + '</div>';
+  }
+  function recRow(r){
+    return '<div class="row tap" data-id="' + esc(r.id) + '"><div class="body"><div class="t">' + esc(r.title) + '</div><div class="m">' + esc((r.date || '').slice(5).replace('-', '/')) + ' · ' + esc(r.cat) + (r.requester ? ' · 요청 ' + esc(r.requester) : '') + (r.handler ? ' → ' + esc(r.handler) : '') + '</div>' +
+      (r.outcome ? '<div class="brief"><i>결과</i>' + esc(clip(r.outcome, 80)) + '</div>' : '') +
+      '<div class="det">' + (r.hidden ? '<p>급여·평가 기록이라서 제목만 보입니다.</p>' : detail(r)) + '</div></div></div>';
   }
   function byDue(a, b){ var x = a.due || '9999', y = b.due || '9999'; return x < y ? -1 : x > y ? 1 : 0; }
   function sec(title, arr){ return '<section class="sec"><h2>' + esc(title) + ' <em>' + arr.length + '</em></h2><div class="list">' + (arr.length ? arr.map(function(c){ return row(c); }).join('') : '<div class="empty">해당 업무가 없습니다.</div>') + '</div></section>'; }
@@ -185,7 +226,7 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
     var late = open.filter(function(c){ return c.due && dleft(c.due) < 0; }), soon = open.filter(function(c){ var n = c.due ? dleft(c.due) : null; return n != null && n >= 0 && n <= 3; });
     stamp.hidden = false; stamp.innerHTML = stampHTML(); top.hidden = false;
     $('sum').innerHTML = '<div class="' + (late.length ? 'hot' : '') + '"><b>' + late.length + '</b><span>마감 지남</span></div><div class="' + (soon.length ? 'amb' : '') + '"><b>' + soon.length + '</b><span>3일 내 마감</span></div><div><b>' + open.length + '</b><span>진행 중</span></div>';
-    ['urgent','team','all'].forEach(function(t){ $('tb-' + t).setAttribute('aria-selected', String(tab === t)); });
+    ['urgent','team','all','rec'].forEach(function(t){ $('tb-' + t).setAttribute('aria-selected', String(tab === t)); });
     var html = '';
     if(tab === 'urgent'){
       var appr = open.filter(function(c){ return c.stage === 'approval' && late.indexOf(c) < 0 && soon.indexOf(c) < 0; });
@@ -202,8 +243,13 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
         return '<details class="mem"' + (mine.length ? ' open' : '') + '><summary><div class="nm"><b>' + esc(n) + '</b> ' + esc(m.title) + '<span>' + esc(m.memo) + '</span></div><div class="cnt">진행 ' + own.length + (wth.length ? ' · 함께 ' + wth.length : '') + (lt ? ' · <em>지연 ' + lt + '</em>' : '') + '</div></summary>' +
           (mine.length ? mine.map(function(c){ return row(c, n); }).join('') : '<div class="empty">진행 중인 업무가 없습니다.</div>') + '</details>';
       }).join('');
+    } else if(tab === 'rec'){
+      var recs = (D.records || []).filter(function(r){ return !q || (r.title + ' ' + (r.requester || '') + ' ' + (r.handler || '') + ' ' + (r.outcome || '') + ' ' + (r.notes || '') + ' ' + (r.kw || '') + ' ' + r.cat).toLowerCase().indexOf(q.toLowerCase()) >= 0; });
+      html = '<input class="search" id="q" type="search" placeholder="기록 검색" value="' + esc(q) + '" aria-label="검색">' +
+        '<section class="sec"><div class="list">' + (recs.length ? recs.map(recRow).join('') : '<div class="empty">' + ((D.records || []).length ? '조건에 맞는 기록이 없습니다.' : '기록용 업무가 없거나, 노트북 프로그램을 새 버전으로 열어 저장하면 나타납니다.') + '</div>') + '</div></section>' +
+        '<p class="note">기록용으로 넣은 업무 최근 150건까지 들어 있습니다. 항목을 누르면 내용이 펼쳐집니다.</p>';
     } else {
-      var list = cards.filter(function(c){ return (!stageF || c.stage === stageF) && (!q || (c.title + ' ' + (c.owner || '') + ' ' + colab(c).join(' ') + ' ' + c.cat + ' ' + (c.no || '') + ' ' + (c.next || '')).toLowerCase().indexOf(q.toLowerCase()) >= 0); });
+      var list = cards.filter(function(c){ return (!stageF || c.stage === stageF) && (!q || (c.title + ' ' + (c.owner || '') + ' ' + colab(c).join(' ') + ' ' + c.cat + ' ' + (c.no || '') + ' ' + (c.next || '') + ' ' + (c.req || '') + ' ' + (c.prog || '')).toLowerCase().indexOf(q.toLowerCase()) >= 0); });
       list.sort(function(a, b){ return (a.stage === 'done') - (b.stage === 'done') || byDue(a, b); });
       html = '<input class="search" id="q" type="search" placeholder="업무, 담당자, 번호 검색" value="' + esc(q) + '" aria-label="검색">' +
         '<div class="chips" id="chips">' + [''].concat(STAGE_ORDER).map(function(s){ return '<button data-st="' + s + '" aria-pressed="' + String(stageF === s) + '">' + (s ? STAGE_NAME[s] : '전체') + '</button>'; }).join('') + '</div>' +
@@ -216,6 +262,7 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
     var ch = $('chips'); if(ch) ch.onclick = function(e){ var b = e.target.closest('button'); if(!b) return; stageF = b.getAttribute('data-st'); render(); };
   }
   document.querySelector('.tabs').addEventListener('click', function(e){ var b = e.target.closest('button'); if(!b) return; tab = b.getAttribute('data-tab'); render(); });
+  $('main').addEventListener('click', function(e){ var r = e.target.closest('.row.tap'); if(!r) return; r.classList.toggle('open'); });
   $('file').addEventListener('change', function(e){ readFile(e.target.files && e.target.files[0]); });
 
   var saved = store(true); if(saved){ try { var o = JSON.parse(saved); if(valid(o)) D = o; } catch(e){} }
