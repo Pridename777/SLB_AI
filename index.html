@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#F4F6FA" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#10141C" media="(prefers-color-scheme: dark)">
 <meta name="robots" content="noindex,nofollow">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="업무 현황">
@@ -10,102 +12,131 @@
 <style>html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
 <title>인사팀 업무 현황</title>
 <style>
-/* 레이아웃: 위에서 아래로 한 줄 목록. 급한 일부터 보이게 하고, 팀원별·전체는 탭으로 나눈다. */
+/* 레이아웃: 아이폰=아래 탭바 / 아이패드 세로=위 고정 탭 / 아이패드 가로=왼쪽 메뉴 + 목록 + 상세 */
 :root{
-  --bg:#F4F6FA; --surface:#FFFFFF; --fg:#151B26; --sub:#566074; --line:#E1E6EE;
+  --bg:#F4F6FA; --surface:#FFFFFF; --fg:#151B26; --sub:#566074; --line:#E1E6EE; --bar:rgba(255,255,255,.92);
   --accent:#2F5BEA; --accent-weak:#E8EEFE;
   --late:#D23B3B; --late-weak:#FDECEC; --warn:#B26A00; --warn-weak:#FFF1DA; --ok:#1E8E5A; --ok-weak:#E3F5EC;
   --font:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic",system-ui,sans-serif;
 }
 @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-  --bg:#10141C; --surface:#1A202B; --fg:#ECEFF5; --sub:#9AA5B8; --line:#2A3241;
+  --bg:#10141C; --surface:#1A202B; --fg:#ECEFF5; --sub:#9AA5B8; --line:#2A3241; --bar:rgba(26,32,43,.92);
   --accent:#7B9CFF; --accent-weak:#222E52;
   --late:#FF7A7A; --late-weak:#3A2024; --warn:#F2B25C; --warn-weak:#3A2D16; --ok:#5ED19A; --ok-weak:#15332A; color-scheme:dark; } }
 :root[data-theme="dark"]{
-  --bg:#10141C; --surface:#1A202B; --fg:#ECEFF5; --sub:#9AA5B8; --line:#2A3241;
+  --bg:#10141C; --surface:#1A202B; --fg:#ECEFF5; --sub:#9AA5B8; --line:#2A3241; --bar:rgba(26,32,43,.92);
   --accent:#7B9CFF; --accent-weak:#222E52;
   --late:#FF7A7A; --late-weak:#3A2024; --warn:#F2B25C; --warn-weak:#3A2D16; --ok:#5ED19A; --ok-weak:#15332A; color-scheme:dark; }
-*{box-sizing:border-box}
-body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px;line-height:1.5;padding-inline:16px;padding-block:0 32px;-webkit-text-size-adjust:100%}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px;line-height:1.5;padding-inline:16px;padding-block:0 calc(88px + env(safe-area-inset-bottom,0px));-webkit-text-size-adjust:100%}
 .wrap{max-width:640px;margin:0 auto}
-header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:14px 8px}
-h1{font-size:20px;line-height:1.3;margin:0}
+header{padding-block:16px 4px}
+.hd{display:flex;align-items:center;gap:10px}
+h1{font-size:22px;line-height:1.25;margin:0;flex:1;min-width:0;letter-spacing:-.01em}
 .stamp{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;margin-top:2px;font-size:12.5px;color:var(--sub)}
-.stamp .stale{color:var(--warn);font-weight:700}
 button,input{font:inherit;color:inherit}
 button{cursor:pointer}
-.link{background:none;border:0;padding:6px 0;color:var(--accent);font-weight:600;font-size:13px}
-.sum{display:flex;gap:6px;margin-top:10px}
-.sum div{flex:1;min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
-.sum b{display:block;font-size:20px;line-height:1.2;font-variant-numeric:tabular-nums}
+.iconbtn{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border:1px solid var(--line);background:var(--surface);border-radius:999px;font-size:13.5px;font-weight:700;color:var(--accent)}
+.iconbtn:active{background:var(--accent-weak)}
+.ic{width:1em;height:1em;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.iconbtn .ic{width:16px;height:16px}
+.sum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:12px}
+.sum button{text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;min-height:64px}
+.sum button:active{background:var(--accent-weak)}
+.sum b{display:block;font-size:24px;line-height:1.15;font-variant-numeric:tabular-nums}
 .sum span{font-size:12px;color:var(--sub)}
-.sum .hot b{color:var(--late)} .sum .amb b{color:var(--warn)}
-.tabs{display:flex;gap:4px;background:var(--line);border-radius:10px;padding:3px;margin-top:12px}
-.tabs button{flex:1;min-width:0;border:0;background:none;border-radius:8px;padding:9px 2px;font-size:13.5px;font-weight:600;color:var(--sub);white-space:nowrap}
-.tabs button[aria-selected="true"]{background:var(--surface);color:var(--fg);box-shadow:0 1px 2px rgba(20,30,50,.12)}
+.sum .hot{background:var(--late-weak);border-color:transparent} .sum .hot b{color:var(--late)}
+.sum .amb{background:var(--warn-weak);border-color:transparent} .sum .amb b{color:var(--warn)}
+/* 탭: 기본(아이폰)은 화면 아래 탭바 */
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;background:var(--bar);-webkit-backdrop-filter:saturate(1.6) blur(14px);backdrop-filter:saturate(1.6) blur(14px);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px))}
+.tabs button{flex:1;min-width:0;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:0;background:none;padding:4px 0;min-height:48px;border-radius:10px;color:var(--sub);font-size:11px;font-weight:700;white-space:nowrap}
+.tabs button .ic{width:22px;height:22px}
+.tabs button[aria-selected="true"]{color:var(--accent)}
+.tabs button[data-n]:not([data-n="0"])::after{content:attr(data-n);position:absolute;top:0;left:calc(50% + 6px);min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:var(--late);color:#fff;font-size:10.5px;line-height:16px;text-align:center;font-variant-numeric:tabular-nums}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-main{display:flex;flex-direction:column;gap:18px;padding-block:14px}
-.sec h2{font-size:13px;margin:0 0 6px;color:var(--sub);font-weight:700}
+main{display:flex;flex-direction:column;gap:18px;padding-block:12px}
+.sec h2{font-size:13px;margin:0 0 6px;color:var(--sub);font-weight:700;scroll-margin-top:12px}
 .sec h2 em{font-style:normal;color:var(--fg);font-variant-numeric:tabular-nums}
-.list{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
-.row{display:flex;gap:10px;padding:12px 14px;border-top:1px solid var(--line);align-items:flex-start}
+.list{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.row{position:relative;display:flex;gap:8px;padding:14px 14px 14px 18px;border-top:1px solid var(--line);align-items:flex-start}
 .row:first-child{border-top:0}
+.row::before{content:"";position:absolute;left:0;top:12px;bottom:12px;width:4px;border-radius:0 4px 4px 0;background:transparent}
+.row.lt::before{background:var(--late)} .row.sn::before{background:var(--warn)}
 .row .body{flex:1;min-width:0}
-.row .t{font-weight:700;overflow-wrap:anywhere}
-.row .m{font-size:12.5px;color:var(--sub);margin-top:2px;overflow-wrap:anywhere}
+.row .t{font-size:16px;line-height:1.4;font-weight:700;overflow-wrap:anywhere}
+.mline{display:flex;align-items:center;gap:8px;margin-top:4px}
+.mline .m{flex:1;min-width:0}
+.row .m{font-size:12.5px;color:var(--sub);overflow-wrap:anywhere}
 .row .n{font-size:13px;margin-top:5px;overflow-wrap:anywhere}
 .row .n i{font-style:normal;color:var(--accent);font-weight:700;margin-right:4px}
 .row.tap{cursor:pointer}
-.row .brief{font-size:13px;margin-top:5px;color:var(--fg);overflow-wrap:anywhere}
+.row.tap:active,.row.sel{background:var(--accent-weak)}
+.chev{flex:none;width:18px;height:18px;margin-top:3px;color:var(--sub);transition:transform .15s}
+.row.open .chev{transform:rotate(180deg)}
+.row .brief{font-size:13.5px;margin-top:6px;color:var(--fg);overflow-wrap:anywhere}
 .row .brief i{font-style:normal;color:var(--sub);font-weight:700;margin-right:4px}
-.row .det{display:none;margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);font-size:13.5px;overflow-wrap:anywhere}
+.row .det{display:none;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-size:14px;overflow-wrap:anywhere}
 .row.open .det{display:block}
-.det h3{font-size:12px;color:var(--sub);margin:10px 0 2px;font-weight:700}
-.det h3:first-child{margin-top:0}
-.det p{margin:0;white-space:pre-wrap}
-.det ul{margin:0;padding-left:18px}
-.det li.dn{color:var(--sub);text-decoration:line-through}
-.det .u{color:var(--sub);font-variant-numeric:tabular-nums;margin-right:6px}
+.det h3,#pane h3{font-size:12px;color:var(--sub);margin:12px 0 2px;font-weight:700}
+.det h3:first-child,#pane h3:first-child{margin-top:0}
+.det p,#pane p{margin:0;white-space:pre-wrap}
+.det ul,#pane ul{margin:0;padding-left:18px}
+.det li,#pane li{margin:2px 0}
+.det li.dn,#pane li.dn{color:var(--sub);text-decoration:line-through}
+.det .u,#pane .u{color:var(--sub);font-variant-numeric:tabular-nums;margin-right:6px}
 .due{flex:none;font-size:12px;font-weight:700;border-radius:999px;padding:2px 9px;background:var(--accent-weak);color:var(--accent);white-space:nowrap;font-variant-numeric:tabular-nums}
 .due.late{background:var(--late-weak);color:var(--late)} .due.soon{background:var(--warn-weak);color:var(--warn)} .due.done{background:var(--ok-weak);color:var(--ok)} .due.none{background:var(--line);color:var(--sub)}
 .who{font-weight:700;color:var(--fg)}
-.empty{padding:16px 14px;color:var(--sub);font-size:14px}
-details.mem{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.empty{padding:18px 14px;color:var(--sub);font-size:14px}
+.allclear{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:32px 18px;color:var(--sub);font-size:14px}
+.allclear .ic{width:34px;height:34px;color:var(--ok)}
+.allclear b{font-size:17px;color:var(--fg)}
+.staleb{display:flex;align-items:center;gap:12px;background:var(--warn-weak);color:var(--warn);border-radius:14px;padding:12px 14px}
+.staleb>div{flex:1;min-width:0}
+.staleb b{display:block;font-size:14.5px}
+.staleb span{display:block;font-size:12.5px;margin-top:1px}
+details.mem{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
 details.mem + details.mem{margin-top:8px}
-details.mem summary{list-style:none;display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer}
+details.mem summary{list-style:none;display:flex;align-items:center;gap:10px;padding:12px 14px;min-height:56px;cursor:pointer}
 details.mem summary::-webkit-details-marker{display:none}
+details.mem summary::after{content:"";flex:none;width:8px;height:8px;border-right:2px solid var(--sub);border-bottom:2px solid var(--sub);transform:rotate(45deg);margin:0 4px 3px 2px;transition:transform .15s}
+details.mem[open] summary::after{transform:rotate(-135deg);margin-bottom:-3px}
 details.mem summary .nm{flex:1;min-width:0}
-details.mem summary .nm b{font-size:15.5px}
+details.mem summary .nm b{font-size:16px}
 details.mem summary .nm span{display:block;font-size:12.5px;color:var(--sub)}
 details.mem summary .cnt{font-size:13px;color:var(--sub);white-space:nowrap;font-variant-numeric:tabular-nums}
 details.mem summary .cnt em{font-style:normal;color:var(--late);font-weight:700}
 details.mem[open] summary{border-bottom:1px solid var(--line)}
 details.mem .row:first-child{border-top:0}
-.search{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:16px}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chips button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:13px;color:var(--sub)}
-.chips button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
-.hero{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px 16px;margin-top:18px}
-.hero h2{margin:0 0 6px;font-size:18px}
-.hero p{margin:0 0 12px;color:var(--sub);font-size:14px}
-.hero ol{margin:0 0 16px;padding-left:20px;color:var(--sub);font-size:14px}
+.search{width:100%;min-height:46px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:16px}
+.chips{display:flex;gap:8px;overflow-x:auto;margin-inline:-16px;padding:2px 16px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chips button{flex:none;min-height:40px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:0 15px;font-size:14px;color:var(--sub)}
+.chips button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:700}
+.hero{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:24px 18px;margin-top:18px}
+.hero h2{margin:0 0 8px;font-size:20px}
+.hero p{margin:0 0 14px;color:var(--sub);font-size:14.5px}
+.hero ol{margin:0 0 18px;padding-left:22px;color:var(--sub);font-size:14.5px;line-height:1.8}
 .hero ol b{color:var(--fg)}
-.btn{display:inline-block;border:0;border-radius:10px;background:var(--accent);color:#fff;font-weight:700;padding:12px 18px;font-size:15px}
-.btn.alt{background:none;color:var(--accent);padding-inline:8px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;border:0;border-radius:12px;background:var(--accent);color:#fff;font-weight:700;padding:0 20px;font-size:15.5px}
+.btn.sm{min-height:40px;padding:0 16px;font-size:14px}
+.btn.alt{background:none;color:var(--accent);padding-inline:10px}
+.staleb .btn{flex:none;background:var(--warn);color:#fff}
 .err{margin-top:10px;color:var(--late);font-size:13.5px}
 .note{margin:0;font-size:12px;color:var(--sub)}
 .sample{display:inline-block;background:var(--warn-weak);color:var(--warn);font-weight:700;font-size:12px;border-radius:999px;padding:1px 9px}
 input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
-.cal{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 6px 8px}
+.cal{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 6px 8px;touch-action:pan-y}
 .calh{display:flex;align-items:center;gap:6px;margin:0 4px 8px}
 .calh b{flex:1;min-width:0;font-size:16px}
-.calh button{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 11px;font-size:13px;color:var(--fg);min-height:36px}
+.calh button{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:0 12px;font-size:13px;color:var(--fg);min-height:40px;min-width:40px}
 .calh button[aria-pressed="true"]{background:var(--accent-weak);border-color:var(--accent);color:var(--accent);font-weight:700}
 .calg{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
 .calw{text-align:center;font-size:12px;color:var(--sub);padding:4px 0;font-weight:700}
 .calw.sun{color:var(--late)}
-.cd{border:0;background:none;border-radius:8px;min-height:50px;padding:4px 1px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--fg)}
-.cd .n{font-size:14px;font-variant-numeric:tabular-nums;min-width:24px;line-height:24px;text-align:center}
+.cd{border:0;background:none;border-radius:10px;min-height:46px;padding:3px 1px;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--fg)}
+.cd .n{font-size:14px;font-variant-numeric:tabular-nums;min-width:26px;line-height:26px;text-align:center}
 .cd.sun .n{color:var(--late)}
 .cd.out{opacity:.45}
 .cd.today .n{background:var(--accent);color:#fff;border-radius:999px}
@@ -118,29 +149,60 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
 .calleg i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
 .tg{display:inline-block;font-size:12px;border-radius:999px;padding:1px 8px;background:var(--accent-weak);color:var(--accent);margin:2px 4px 0 0;white-space:nowrap}
 .hint{margin:0 0 8px;font-size:13px;color:var(--warn);background:var(--warn-weak);border-radius:10px;padding:8px 12px}
-/* 아이패드 등 넓은 화면: 폭을 넓히고 글자를 키운다 */
-@media (min-width:700px){ .wrap{max-width:880px} body{font-size:16.5px;padding-inline:24px} h1{font-size:23px} .tabs button{font-size:15.5px;padding:11px 4px} .row{padding:14px 18px} .row .m,.row .n,.row .brief{font-size:14.5px} .row .det{font-size:15px} .sum b{font-size:24px} .sum span{font-size:13px} .chips button{font-size:14.5px;padding:7px 14px} .search{font-size:17px;padding:12px 14px} .cd{min-height:62px} .cd .n{font-size:16px} }
+#pane{display:none}
+.nodata #pane{display:none!important}
+/* 아이패드 세로 등: 위쪽에 고정 탭, 글자 키움 */
+@media (min-width:700px){
+  .wrap{max-width:880px}
+  body{font-size:16.5px;padding-inline:24px;padding-block:0 40px}
+  h1{font-size:26px}
+  .tabs{position:sticky;top:env(safe-area-inset-top,0px);bottom:auto;left:auto;right:auto;margin:6px -8px 4px;padding:8px;border:0;border-bottom:1px solid var(--line);gap:4px}
+  .tabs button{flex-direction:row;gap:8px;font-size:15.5px;min-height:46px}
+  .tabs button .ic{width:20px;height:20px}
+  .tabs button[aria-selected="true"]{background:var(--surface);color:var(--fg);box-shadow:0 1px 3px rgba(20,30,50,.14)}
+  .tabs button[data-n]:not([data-n="0"])::after{position:static;margin-left:2px}
+  .sum b{font-size:28px} .sum span{font-size:13.5px} .sum button{min-height:76px;padding:12px 16px}
+  .row{padding:16px 20px 16px 22px}
+  .row .t{font-size:17.5px} .row .m,.row .n,.row .brief{font-size:14.5px} .row .det{font-size:15.5px}
+  .chips{margin-inline:0;padding-inline:0;flex-wrap:wrap;overflow:visible}
+  .chips button{font-size:14.5px}
+  .search{font-size:17px;min-height:50px}
+  .cd{min-height:62px} .cd .n{font-size:16px}
+}
+/* 아이패드 가로: 왼쪽 메뉴 + 가운데 목록 + 오른쪽 상세 */
+@media (min-width:1100px){
+  body{padding-inline:32px}
+  .wrap{max-width:1240px;display:grid;grid-template-columns:184px minmax(0,1fr) 420px;grid-template-areas:"hd hd hd" "st st st" "tb sm pn" "tb mn pn";column-gap:28px;align-items:start}
+  .nodata .wrap{display:block;max-width:640px}
+  header{display:contents}
+  .hd{grid-area:hd}
+  .stamp{grid-area:st}
+  #top{grid-area:sm}
+  .tabs{grid-area:tb;position:sticky;top:16px;flex-direction:column;margin:0;padding:0;border:0;background:none;-webkit-backdrop-filter:none;backdrop-filter:none;gap:2px}
+  .tabs button{justify-content:flex-start;width:100%;padding:0 14px;min-height:50px;border-radius:12px}
+  .tabs button[data-n]:not([data-n="0"])::after{margin-left:auto}
+  main{grid-area:mn;padding-block:14px}
+  #pane{display:block;grid-area:pn;position:sticky;top:16px;max-height:calc(100vh - 32px);overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px 22px;font-size:15.5px}
+  #pane .pt{font-size:20px;line-height:1.35;font-weight:700;overflow-wrap:anywhere}
+  #pane .pe{color:var(--sub);font-size:14.5px;padding:24px 4px;text-align:center}
+  #pane .pd{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);overflow-wrap:anywhere}
+  .row .det{display:none!important}
+  .chev{display:none}
+}
+@media (prefers-reduced-motion:reduce){ .chev,details.mem summary::after{transition:none} }
 </style>
 </head>
 <body>
 
 <div class="wrap">
   <header>
-    <h1>인사팀 업무 현황</h1>
+    <div class="hd"><h1>인사팀 업무 현황</h1><button class="iconbtn" id="reload" hidden><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>새 파일</button></div>
     <div class="stamp" id="stamp" hidden></div>
-    <div id="top" hidden>
-      <div class="sum" id="sum"></div>
-      <div class="tabs" role="tablist" aria-label="보기">
-        <button role="tab" id="tb-urgent" aria-selected="true" data-tab="urgent">급한 일</button>
-        <button role="tab" id="tb-cal" aria-selected="false" data-tab="cal">일정</button>
-        <button role="tab" id="tb-team" aria-selected="false" data-tab="team">팀원별</button>
-        <button role="tab" id="tb-all" aria-selected="false" data-tab="all">전체</button>
-        <button role="tab" id="tb-rec" aria-selected="false" data-tab="rec">기록용</button>
-        <button role="tab" id="tb-adv" aria-selected="false" data-tab="adv">노무</button>
-      </div>
-    </div>
+    <div id="top" hidden><div class="sum" id="sum"></div></div>
   </header>
+  <nav class="tabs" id="tabs" role="tablist" aria-label="보기" hidden><button role="tab" id="tb-urgent" aria-selected="true" data-tab="urgent"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg><span>급한 일</span></button><button role="tab" id="tb-cal" aria-selected="false" data-tab="cal"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v3"/><path d="M16 2v3"/><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M8 13h.01"/><path d="M12 13h.01"/><path d="M16 13h.01"/><path d="M8 17h.01"/><path d="M12 17h.01"/><path d="M16 17h.01"/></svg><span>일정</span></button><button role="tab" id="tb-team" aria-selected="false" data-tab="team"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.128a4 4 0 0 1 0 7.744"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg><span>팀원별</span></button><button role="tab" id="tb-all" aria-selected="false" data-tab="all"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h.01"/><path d="M3 12h.01"/><path d="M3 19h.01"/><path d="M8 5h13"/><path d="M8 12h13"/><path d="M8 19h13"/></svg><span>전체</span></button><button role="tab" id="tb-rec" aria-selected="false" data-tab="rec"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg><span>기록용</span></button><button role="tab" id="tb-adv" aria-selected="false" data-tab="adv"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18"/><path d="m19 8 3 8a5 5 0 0 1-6 0zV7"/><path d="M3 7h1a17 17 0 0 0 8-2 17 17 0 0 0 8 2h1"/><path d="m5 8 3 8a5 5 0 0 1-6 0zV7"/><path d="M7 21h10"/></svg><span>노무</span></button></nav>
   <main id="main"></main>
+  <aside id="pane" aria-live="polite"></aside>
   <input type="file" id="file" accept="application/json,.json,text/plain">
 </div>
 
@@ -149,7 +211,10 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
   var KEY = 'slb_m_data_v1';
   var STAGE_ORDER = ['intake','writing','review','approval','done'];
   var STAGE_NAME = {intake:'접수', writing:'작성 중', review:'검토 중', approval:'승인 대기', done:'완료'};
-  var D = null, sample = false, tab = 'urgent', q = '', stageF = '', aq = '', advF = '';
+  var D = null, sample = false, tab = 'urgent', q = '', stageF = '', aq = '', advF = '', selId = '';
+  var CHEV = '<svg class="ic chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
+  var CHECK = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m16 9-5.5 5.5L8 12"/></svg>';
+  function isWide(){ return !!D && !!(window.matchMedia && window.matchMedia('(min-width:1100px)').matches); }
   var $ = function(id){ return document.getElementById(id); };
   function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
   function today(){ var d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
@@ -221,13 +286,14 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
       : (c.owner === forMember ? '' : '<span class="who">함께</span> · 담당 ' + esc(c.owner || '미지정') + ' · ');
     var brief = (c.req ? '<div class="brief"><i>내용</i>' + esc(clip(c.req, 70)) + '</div>' : '') + (lastProg(c) && c.stage !== 'done' ? '<div class="brief"><i>진행</i>' + esc(clip(lastProg(c), 80)) + '</div>' : '') + (c.done && c.done.sum ? '<div class="brief"><i>결과</i>' + esc(clip(c.done.sum, 80)) + '</div>' : '');
     var tap = hasDet(c) || c.hidden;
-    return '<div class="row' + (tap ? ' tap' : '') + '" data-id="' + esc(c.id) + '"><div class="body"><div class="t">' + esc(c.title) + '</div><div class="m">' + who + esc(c.cat) + ' · ' + esc(STAGE_NAME[c.stage] || c.stage) + (c.no ? ' · ' + esc(c.no) : '') + '</div>' + brief + (c.next && c.stage !== 'done' ? '<div class="n"><i>다음</i>' + esc(c.next) + '</div>' : '') +
-      (tap ? '<div class="det">' + (c.hidden ? '<p>급여·평가 업무라서 제목만 보입니다. 노트북 프로그램 설정에서 바꿀 수 있습니다.</p>' : detail(c)) + '</div>' : '') + '</div>' + dueChip(c) + '</div>';
+    var dl = (c.due && c.stage !== 'done') ? dleft(c.due) : null, urg = dl == null ? '' : dl < 0 ? ' lt' : dl <= 3 ? ' sn' : '';
+    return '<div class="row' + (tap ? ' tap' : '') + urg + '" data-id="' + esc(c.id) + '"><div class="body"><div class="t">' + esc(c.title) + '</div><div class="mline"><div class="m">' + who + esc(c.cat) + ' · ' + esc(STAGE_NAME[c.stage] || c.stage) + (c.no ? ' · ' + esc(c.no) : '') + '</div>' + dueChip(c) + '</div>' + brief + (c.next && c.stage !== 'done' ? '<div class="n"><i>다음</i>' + esc(c.next) + '</div>' : '') +
+      (tap ? '<div class="det">' + (c.hidden ? '<p>급여·평가 업무라서 제목만 보입니다. 노트북 프로그램 설정에서 바꿀 수 있습니다.</p>' : detail(c)) + '</div>' : '') + '</div>' + (tap ? CHEV : '') + '</div>';
   }
   function recRow(r){
-    return '<div class="row tap" data-id="' + esc(r.id) + '"><div class="body"><div class="t">' + esc(r.title) + '</div><div class="m">' + esc((r.date || '').slice(5).replace('-', '/')) + ' · ' + esc(r.cat) + (r.requester ? ' · 요청 ' + esc(r.requester) : '') + (r.handler ? ' → ' + esc(r.handler) : '') + '</div>' +
+    return '<div class="row tap" data-id="' + esc(r.id) + '"><div class="body"><div class="t">' + esc(r.title) + '</div><div class="mline"><div class="m">' + esc((r.date || '').slice(5).replace('-', '/')) + ' · ' + esc(r.cat) + (r.requester ? ' · 요청 ' + esc(r.requester) : '') + (r.handler ? ' → ' + esc(r.handler) : '') + '</div></div>' +
       (r.outcome ? '<div class="brief"><i>결과</i>' + esc(clip(r.outcome, 80)) + '</div>' : '') +
-      '<div class="det">' + (r.hidden ? '<p>급여·평가 기록이라서 제목만 보입니다.</p>' : detail(r)) + '</div></div></div>';
+      '<div class="det">' + (r.hidden ? '<p>급여·평가 기록이라서 제목만 보입니다.</p>' : detail(r)) + '</div></div>' + CHEV + '</div>';
   }
   var calM = '', calD = '', calDone = true;
   function p2(n){ return ('0' + n).slice(-2); }
@@ -240,7 +306,7 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
   }
   function ctRow(e){
     var n = dleft(e.d), chip = n == null ? '' : n < 0 ? '<span class="due late">' + (-n) + '일 지남</span>' : n === 0 ? '<span class="due soon">오늘</span>' : '<span class="due' + (n <= 14 ? ' soon' : '') + '">D-' + n + '</span>';
-    return '<div class="row"><div class="body"><div class="t">' + esc(e.t) + '</div><div class="m"><span class="who">계약</span> · ' + esc(e.s) + '</div></div>' + chip + '</div>';
+    return '<div class="row"><div class="body"><div class="t">' + esc(e.t) + '</div><div class="mline"><div class="m"><span class="who">계약</span> · ' + esc(e.s) + '</div>' + chip + '</div></div></div>';
   }
   function calHTML(){
     var t = today(); if(!calM) calM = dstr(t).slice(0, 7); if(!calD) calD = dstr(t);
@@ -259,7 +325,7 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
     var rows = sel.cs.sort(byDue).map(function(c){ return row(c); }).join('') + sel.ct.map(ctRow).join('') + sel.rs.map(recRow).join('');
     return '<div class="cal"><div class="calh"><button data-cal="prev" aria-label="이전 달">◀</button><b>' + y + '년 ' + m + '월</b><button data-cal="today">오늘</button><button data-cal="done" aria-pressed="' + String(calDone) + '">끝난 일</button><button data-cal="next" aria-label="다음 달">▶</button></div><div class="calg">' + cells + '</div>' +
       '<div class="calleg"><span><i style="background:var(--accent)"></i>진행 중</span><span><i style="background:var(--late)"></i>마감 지남</span><span><i style="background:var(--ok)"></i>완료</span><span><i style="background:var(--warn)"></i>계약</span><span><i style="background:var(--sub)"></i>기록용</span></div></div>' +
-      '<section class="sec"><h2>' + (sd.getMonth() + 1) + '월 ' + sd.getDate() + '일 (' + ['일','월','화','수','목','금','토'][sd.getDay()] + ') <em>' + sel.n + '</em></h2><div class="list">' + (rows || '<div class="empty">이 날 일정이 없습니다.</div>') + '</div></section>' +
+      '<section class="sec"><h2 id="dayhead">' + (sd.getMonth() + 1) + '월 ' + sd.getDate() + '일 (' + ['일','월','화','수','목','금','토'][sd.getDay()] + ') <em>' + sel.n + '</em></h2><div class="list">' + (rows || '<div class="empty">이 날 일정이 없습니다.</div>') + '</div></section>' +
       '<p class="note">업무 마감일을 달력에 보여 줍니다. 마감일이 없는 업무는 달력에 나오지 않습니다.' + (D.ev === undefined ? ' 계약 일정은 노트북 프로그램을 새 버전으로 열어 저장하면 나타납니다.' : '') + '</p>';
   }
   function calClick(a){
@@ -269,6 +335,7 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
     else if(a === 'done'){ calDone = !calDone; }
     else if(a.indexOf('day:') === 0){ calD = a.slice(4); calM = calD.slice(0, 7) === calM ? calM : calD.slice(0, 7); }
     render();
+    if(a.indexOf('day:') === 0){ var h = $('dayhead'); if(h && !isWide() && h.scrollIntoView){ var calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; h.scrollIntoView({behavior: calm ? 'auto' : 'smooth', block:'start'}); } }
   }
   var PART = '을를은는이가에의도로와과';
   function advTok(t){ t = t.toLowerCase(); var out = [t]; if(t.length >= 3 && PART.indexOf(t.slice(-1)) >= 0) out.push(t.slice(0, -1)); return out; }
@@ -277,10 +344,10 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
     toks.forEach(function(tk){ var f = advTok(tk), hit = f.some(function(w){ return h.indexOf(w) >= 0; }); if(hit){ n += 1 + (f.some(function(w){ return t.indexOf(w) >= 0; }) ? 1 : 0); } else all = false; });
     return {n:n, all:all}; }
   function advRow(x){
-    return '<div class="row tap" data-id="' + esc(x.id) + '"><div class="body"><div class="t">' + esc(x.title) + '</div><div class="m">' + esc([x.date, x.firm].filter(Boolean).join(' · ')) + '</div>' +
+    return '<div class="row tap" data-id="' + esc(x.id) + '"><div class="body"><div class="t">' + esc(x.title) + '</div><div class="mline"><div class="m">' + esc([x.date, x.firm].filter(Boolean).join(' · ')) + '</div></div>' +
       ((x.tags && x.tags.length) ? '<div>' + x.tags.map(function(t){ return '<span class="tg">' + esc(t) + '</span>'; }).join('') + '</div>' : '') +
       (x.c ? '<div class="brief"><i>결론</i>' + esc(clip(x.c, 110)) + '</div>' : '') +
-      '<div class="det">' + part('결론', x.c) + part('질문', x.q) + part('답변', x.a) + part('근거', x.b) + part('적용할 때 주의할 점', x.w) + '<p class="note" style="margin-top:10px">자문을 받은 날의 사실관계와 법령 기준입니다. 이번 사안과 다르거나 법이 바뀌었을 수 있으니 중요한 결정 전에는 노무사에게 다시 확인하세요.</p></div></div></div>';
+      '<div class="det">' + part('결론', x.c) + part('질문', x.q) + part('답변', x.a) + part('근거', x.b) + part('적용할 때 주의할 점', x.w) + '<p class="note" style="margin-top:10px">자문을 받은 날의 사실관계와 법령 기준입니다. 이번 사안과 다르거나 법이 바뀌었을 수 있으니 중요한 결정 전에는 노무사에게 다시 확인하세요.</p></div></div>' + CHEV + '</div>';
   }
   function advHTML(){
     if(!Array.isArray(D.adv)) return '<section class="sec"><div class="list"><div class="empty">노무 자문은 노트북 프로그램을 새 버전으로 열어 저장하면 나타납니다. 노트북 설정에서 끈 경우에도 나타나지 않습니다.</div></div></section>';
@@ -303,14 +370,18 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
 
   function stampHTML(){
     var at = String(D.at || ''), txt = at ? (+at.slice(5, 7)) + '월 ' + (+at.slice(8, 10)) + '일 ' + at.slice(11, 16) : '';
-    var stale = '';
-    if(at && !sample){ var p = at.slice(0, 10).split('-'); var n = Math.round((today() - new Date(+p[0], +p[1] - 1, +p[2])) / 86400000); if(n >= 1) stale = '<span class="stale">' + n + '일 전 현황입니다</span>'; }
-    return (sample ? '<span class="sample">예시 데이터</span>' : '') + '<span>노트북에서 저장한 시각 ' + esc(txt) + '</span>' + stale + '<button class="link" id="reload">새 파일 불러오기</button>';
+    return (sample ? '<span class="sample">예시 데이터</span>' : '') + '<span>노트북에서 저장한 시각 ' + esc(txt) + '</span>';
+  }
+  function staleHTML(){
+    var at = String(D.at || ''); if(!at || sample) return '';
+    var p = at.slice(0, 10).split('-'), n = Math.round((today() - new Date(+p[0], +p[1] - 1, +p[2])) / 86400000);
+    if(!(n >= 1)) return '';
+    return '<div class="staleb" role="status"><div><b>' + n + '일 전 현황입니다</b><span>노트북에서 저장한 뒤 새 파일을 불러오세요.</span></div><button class="btn sm" id="reload2">불러오기</button></div>';
   }
   function render(){
     var main = $('main'), top = $('top'), stamp = $('stamp');
     if(!D){
-      top.hidden = true; stamp.hidden = true;
+      top.hidden = true; stamp.hidden = true; $('tabs').hidden = true; $('reload').hidden = true; document.body.classList.add('nodata'); $('pane').innerHTML = '';
       main.innerHTML = '<section class="hero"><h2>업무 현황 파일을 불러오세요</h2><p>이 화면은 조회 전용입니다. 노트북 프로그램이 저장한 파일을 이 기기 안에서만 읽어서 보여 주며, 어디로도 전송하지 않습니다.</p>' +
         '<ol><li>파일 앱에서 <b>iCloud Drive</b>의 업무 폴더를 엽니다.</li><li>맨 위의 <b>모바일_현황.json</b>을 선택합니다.</li></ol>' +
         '<button class="btn" id="pick">파일 선택</button> <button class="btn alt" id="demo">예시로 둘러보기</button><div class="err" id="err" role="alert"></div></section>' +
@@ -320,13 +391,15 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
     }
     var cards = D.cards.slice(), open = cards.filter(function(c){ return c.stage !== 'done'; });
     var late = open.filter(function(c){ return c.due && dleft(c.due) < 0; }), soon = open.filter(function(c){ var n = c.due ? dleft(c.due) : null; return n != null && n >= 0 && n <= 3; });
-    stamp.hidden = false; stamp.innerHTML = stampHTML(); top.hidden = false;
-    $('sum').innerHTML = '<div class="' + (late.length ? 'hot' : '') + '"><b>' + late.length + '</b><span>마감 지남</span></div><div class="' + (soon.length ? 'amb' : '') + '"><b>' + soon.length + '</b><span>3일 내 마감</span></div><div><b>' + open.length + '</b><span>진행 중</span></div>';
+    stamp.hidden = false; stamp.innerHTML = stampHTML(); top.hidden = false; $('tabs').hidden = false; $('reload').hidden = false; document.body.classList.remove('nodata');
+    $('sum').innerHTML = '<button data-go="urgent" class="' + (late.length ? 'hot' : '') + '"><b>' + late.length + '</b><span>마감 지남</span></button><button data-go="urgent" class="' + (soon.length ? 'amb' : '') + '"><b>' + soon.length + '</b><span>3일 내 마감</span></button><button data-go="all"><b>' + open.length + '</b><span>진행 중</span></button>';
+    $('tb-urgent').setAttribute('data-n', String(late.length + soon.length));
     ['urgent','cal','team','all','rec','adv'].forEach(function(t){ $('tb-' + t).setAttribute('aria-selected', String(tab === t)); });
     var html = '';
     if(tab === 'urgent'){
       var appr = open.filter(function(c){ return c.stage === 'approval' && late.indexOf(c) < 0 && soon.indexOf(c) < 0; });
-      html = sec('마감 지남', late.sort(byDue)) + sec('3일 안에 마감', soon.sort(byDue)) + sec('승인 대기', appr.sort(byDue));
+      html = (late.length || soon.length || appr.length) ? sec('마감 지남', late.sort(byDue)) + sec('3일 안에 마감', soon.sort(byDue)) + sec('승인 대기', appr.sort(byDue))
+        : '<div class="allclear">' + CHECK + '<b>급한 일이 없습니다</b><span>마감이 지났거나 3일 안에 끝나는 업무, 승인을 기다리는 업무가 없습니다.</span></div>';
     } else if(tab === 'cal'){
       html = calHTML();
     } else if(tab === 'team'){
@@ -356,16 +429,37 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
         '<section class="sec"><div class="list" id="alllist">' + (list.length ? list.map(function(c){ return row(c); }).join('') : '<div class="empty">조건에 맞는 업무가 없습니다.</div>') + '</div></section>' +
         '<p class="note">완료한 업무는 최근 30일 분만 들어 있습니다.</p>';
     }
-    main.innerHTML = html;
+    main.innerHTML = staleHTML() + html;
     var rl = $('reload'); if(rl) rl.onclick = pick;
+    var rl2 = $('reload2'); if(rl2) rl2.onclick = pick;
     var qi = $('q'); if(qi) qi.oninput = function(){ q = qi.value; var pos = qi.selectionStart; render(); var n = $('q'); n.focus(); try { n.setSelectionRange(pos, pos); } catch(e){} };
     var ai = $('aq'); if(ai) ai.oninput = function(){ aq = ai.value; var pos = ai.selectionStart; render(); var n = $('aq'); n.focus(); try { n.setSelectionRange(pos, pos); } catch(e){} };
     var ach = $('achips'); if(ach) ach.onclick = function(e){ var b = e.target.closest('button'); if(!b) return; advF = b.getAttribute('data-at'); render(); };
     var ch = $('chips'); if(ch) ch.onclick = function(e){ var b = e.target.closest('button'); if(!b) return; stageF = b.getAttribute('data-st'); render(); };
+    syncPane();
   }
-  document.querySelector('.tabs').addEventListener('click', function(e){ var b = e.target.closest('button'); if(!b) return; tab = b.getAttribute('data-tab'); render(); });
+  /* 아이패드 가로: 오른쪽 상세 화면 */
+  function selRows(){ return [].slice.call(document.querySelectorAll('#main .row[data-id]')).filter(function(r){ return r.getAttribute('data-id') === selId; }); }
+  function syncPane(){
+    var pane = $('pane'); if(!pane) return;
+    [].slice.call(document.querySelectorAll('#main .row.sel')).forEach(function(r){ r.classList.remove('sel'); });
+    if(!isWide()){ pane.innerHTML = ''; return; }
+    var rows = selId ? selRows() : [];
+    if(!rows.length){ pane.innerHTML = '<div class="pe">왼쪽 목록에서 업무를 누르면 자세한 내용이 여기에 나옵니다.</div>'; return; }
+    rows.forEach(function(r){ r.classList.add('sel'); });
+    var r = rows[0], t = r.querySelector('.t'), ml = r.querySelector('.mline'), dt = r.querySelector('.det');
+    pane.innerHTML = '<div class="pt">' + (t ? t.innerHTML : '') + '</div>' + (ml ? ml.outerHTML : '') + '<div class="pd">' + (dt ? dt.innerHTML : '') + '</div>';
+    pane.scrollTop = 0;
+  }
+  document.querySelector('.tabs').addEventListener('click', function(e){ var b = e.target.closest('button'); if(!b) return; tab = b.getAttribute('data-tab'); render(); window.scrollTo(0, 0); });
+  $('sum').addEventListener('click', function(e){ var b = e.target.closest('[data-go]'); if(!b) return; tab = b.getAttribute('data-go'); if(tab === 'all') stageF = ''; render(); window.scrollTo(0, 0); });
   $('main').addEventListener('click', function(e){ var b = e.target.closest('[data-cal]'); if(b){ calClick(b.getAttribute('data-cal')); } });
-  $('main').addEventListener('click', function(e){ var r = e.target.closest('.row.tap'); if(!r) return; r.classList.toggle('open'); });
+  $('main').addEventListener('click', function(e){ var r = e.target.closest('.row.tap'); if(!r) return; if(isWide()){ selId = r.getAttribute('data-id') || ''; syncPane(); } else r.classList.toggle('open'); });
+  /* 달력에서 좌우로 밀면 달 이동 */
+  var tx = 0, ty = 0, tok = false;
+  $('main').addEventListener('touchstart', function(e){ var t = e.touches[0]; tx = t.clientX; ty = t.clientY; tok = !!e.target.closest('.cal'); }, {passive:true});
+  $('main').addEventListener('touchend', function(e){ if(!tok) return; tok = false; var t = e.changedTouches[0], dx = t.clientX - tx, dy = t.clientY - ty; if(Math.abs(dx) > 60 && Math.abs(dy) < 40) calClick(dx < 0 ? 'next' : 'prev'); }, {passive:true});
+  if(window.matchMedia){ var mq = window.matchMedia('(min-width:1100px)'), onmq = function(){ if(D) render(); }; if(mq.addEventListener) mq.addEventListener('change', onmq); else if(mq.addListener) mq.addListener(onmq); }
   $('file').addEventListener('change', function(e){ readFile(e.target.files && e.target.files[0]); });
 
   var saved = store(true); if(saved){ try { var o = JSON.parse(saved); if(valid(o)) D = o; } catch(e){} }
