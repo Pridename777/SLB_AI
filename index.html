@@ -211,7 +211,7 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
   var KEY = 'slb_m_data_v1';
   var STAGE_ORDER = ['intake','writing','review','approval','done'];
   var STAGE_NAME = {intake:'접수', writing:'작성 중', review:'검토 중', approval:'승인 대기', done:'완료'};
-  var D = null, sample = false, tab = 'urgent', q = '', stageF = '', aq = '', advF = '', selId = '';
+  var D = null, sample = false, tab = 'urgent', q = '', stageF = '', aq = '', advF = '', advR = '', selId = '';
   var CHEV = '<svg class="ic chev" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>';
   var CHECK = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m16 9-5.5 5.5L8 12"/></svg>';
   function isWide(){ return !!D && !!(window.matchMedia && window.matchMedia('(min-width:1100px)').matches); }
@@ -227,8 +227,8 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
     return {app:'모바일 현황', at:at,
       members:[{name:'팀원 가',title:'책임',memo:'교육, 조직문화'},{name:'팀원 나',title:'책임',memo:'평가'},{name:'팀원 다',title:'선임',memo:'급여, 평가'},{name:'팀원 라',title:'선임',memo:'급여, 교육'},{name:'팀원 마',title:'주임',memo:'채용'}],
       cards:[
-        {id:'s1',no:'HR-0412',title:'리더십 과정 운영 안내문',cat:'교육·육성',stage:'approval',owner:'팀원 가',collab:['팀원 라'],due:f(-2),next:'교육 일정 확정 후 안내문 발송',req:'리더 대상 교육 과정의 운영 일정과 참석 안내문을 만들어 주세요.',prog:'안내문 초안 작성 완료. 일정 확정을 기다리는 중.',todo:[{t:'일정 확정',d:false},{t:'안내문 발송',d:false}],ups:[{at:f(-5),t:'안내문 초안 작성'},{at:f(-3),t:'팀장 검토 요청'}]},
-        {id:'s2',no:'HR-0415',title:'하반기 평가 일정 공지',cat:'평가·보상',stage:'writing',owner:'팀원 나',due:f(2),next:'평가 기간과 제출처 확인',req:'하반기 평가 일정을 전 직원에게 공지해야 합니다.',prog:'공지 문구 초안 작성 중.',ups:[{at:f(-1),t:'일정표 수령'}]},
+        {id:'s1',no:'HR-0412',title:'리더십 과정 운영 안내문',cat:'교육·육성',stage:'approval',dr:1,owner:'팀원 가',collab:['팀원 라'],due:f(-2),next:'교육 일정 확정 후 안내문 발송',req:'리더 대상 교육 과정의 운영 일정과 참석 안내문을 만들어 주세요.',prog:'안내문 초안 작성 완료. 일정 확정을 기다리는 중.',todo:[{t:'일정 확정',d:false},{t:'안내문 발송',d:false}],ups:[{at:f(-5),t:'안내문 초안 작성'},{at:f(-3),t:'팀장 검토 요청'}]},
+        {id:'s2',no:'HR-0415',title:'하반기 평가 일정 공지',cat:'평가·보상',stage:'writing',nts:[{at:f(-1),t:'제출처를 팀별 담당자로 바꾸는 방향으로 정리 예정'}],owner:'팀원 나',due:f(2),next:'평가 기간과 제출처 확인',req:'하반기 평가 일정을 전 직원에게 공지해야 합니다.',prog:'공지 문구 초안 작성 중.',ups:[{at:f(-1),t:'일정표 수령'}]},
         {id:'s3',no:'HR-0418',title:'급여 기준 점검 회신',cat:'급여',stage:'review',owner:'팀원 다',collab:['팀원 라','팀원 나'],due:f(9),next:'수당 기준 조항 대조',hidden:1},
         {id:'s4',no:'HR-0420',title:'신입 교육 계획',cat:'교육·육성',stage:'intake',owner:'팀원 라',due:f(15),next:'대상자와 교육 기간 확인',req:'신입 사원 교육 계획안 작성.',prog:'접수 완료. 대상자 확인 전.'},
         {id:'s5',no:'HR-0421',title:'생산직 채용공고 초안',cat:'채용',stage:'writing',owner:'팀원 마',due:f(4),next:'모집 요강과 근무 조건 정리',req:'생산직 채용공고 초안.',prog:'모집 요강 정리 중.'},
@@ -238,7 +238,7 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
         {id:'r1',no:'REC-1',title:'사내 교육 문의 답변',cat:'교육·육성',date:f(-3),requester:'생산팀',handler:'팀원 가',outcome:'교육 신청 방법을 안내함.',notes:'다음 분기 일정은 추후 공지 예정.',kw:'교육, 신청'},
         {id:'r2',no:'REC-2',title:'급여 관련 문의',cat:'급여',date:f(-8),requester:'',handler:'팀원 나',hidden:1}
       ], ev:[{d:f(6),k:'ct',t:'동영상 편집 프로그램',s:'해지·갱신 통보기한'},{d:f(36),k:'ct',t:'동영상 편집 프로그램',s:'계약 종료일'},{d:f(12),k:'ct',t:'디자인 편집 사이트',s:'계약 종료일'}],
-      adv:[{id:'a1',title:'수습기간 중 본채용 거부 가능 여부',firm:'예시 노무법인',date:f(-12),ans:f(-9),tags:['퇴직·해고','근로계약·채용'],q:'수습 3개월 중 근태가 좋지 않은 직원의 본채용을 거부할 수 있는지 문의함.',a:'수습기간 중이라도 본채용 거부는 해고에 해당하므로 객관적이고 합리적인 사유와 서면 통지가 필요하다는 답변.',c:'평가 근거를 갖추고 서면으로 통지하면 본채용 거부가 가능하다.',b:'근로기준법 제23조, 제27조',w:'평가 기준이 사전에 공지되어 있어야 한다.'},{id:'a2',title:'연차 미사용 수당 산정 기준',firm:'예시 노무법인',date:f(-40),ans:f(-38),tags:['휴일·휴가','임금·수당'],q:'퇴직자의 미사용 연차 수당을 어떤 임금으로 계산하는지 문의함.',a:'통상임금을 기준으로 하되 취업규칙에 다른 정함이 있으면 확인이 필요하다는 답변.',c:'원칙은 통상임금 기준이다.',b:'근로기준법 제60조, 제61조',w:'회계연도 기준 부여 방식이면 산정 기간이 달라질 수 있다.'}], advHidden:1};
+      adv:[{id:'a3',r:'na',title:'미국 근무자 초과근무 수당 기준',firm:'예시 노무법인(북미)',date:f(-5),ans:f(-3),tags:['근로시간·연장근로','임금·수당'],q:'미국 법인 근무자의 주 40시간 초과 근무에 수당을 어떻게 주는지 문의함.',a:'비면제 직원은 주 40시간을 넘는 시간에 정상 임금의 1.5배를 지급하고, 면제 여부는 직무와 급여 기준으로 판단한다는 답변. 주(州)별 별도 규정은 따로 확인해야 한다.',c:'비면제 직원의 주 40시간 초과 근무는 1.5배 지급이 원칙이다.',b:'연방 공정근로기준법(FLSA), 해당 주 법령',w:'주마다 규정이 다르다. 근무지 주를 먼저 확인한다.'},{id:'a1',r:'kr',title:'수습기간 중 본채용 거부 가능 여부',firm:'예시 노무법인',date:f(-12),ans:f(-9),tags:['퇴직·해고','근로계약·채용'],q:'수습 3개월 중 근태가 좋지 않은 직원의 본채용을 거부할 수 있는지 문의함.',a:'수습기간 중이라도 본채용 거부는 해고에 해당하므로 객관적이고 합리적인 사유와 서면 통지가 필요하다는 답변.',c:'평가 근거를 갖추고 서면으로 통지하면 본채용 거부가 가능하다.',b:'근로기준법 제23조, 제27조',w:'평가 기준이 사전에 공지되어 있어야 한다.'},{id:'a2',r:'kr',title:'연차 미사용 수당 산정 기준',firm:'예시 노무법인',date:f(-40),ans:f(-38),tags:['휴일·휴가','임금·수당'],q:'퇴직자의 미사용 연차 수당을 어떤 임금으로 계산하는지 문의함.',a:'통상임금을 기준으로 하되 취업규칙에 다른 정함이 있으면 확인이 필요하다는 답변.',c:'원칙은 통상임금 기준이다.',b:'근로기준법 제60조, 제61조',w:'회계연도 기준 부여 방식이면 산정 기간이 달라질 수 있다.'}], advHidden:1};
   }
   function valid(o){ return o && typeof o === 'object' && Array.isArray(o.cards) && Array.isArray(o.members); }
   function load(o, isSample){ D = o; sample = !!isSample; if(!isSample) store(false, JSON.stringify(o)); render(); }
@@ -263,10 +263,11 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
     if(n <= 3) return '<span class="due soon">D-' + n + '</span>';
     return '<span class="due">' + esc(c.due.slice(5).replace('-', '/')) + '</span>';
   }
+  function stName(c){ return c.dr ? '완료 승인 대기' : (STAGE_NAME[c.stage] || c.stage); }
   function colab(c){ return (c.collab || []).filter(function(n){ return n && n !== c.owner; }); }
   function clip(t, n){ t = String(t || '').replace(/\s+/g, ' ').trim(); return t.length > n ? t.slice(0, n - 1) + '…' : t; }
   function lastProg(c){ var u = c.ups && c.ups.length ? c.ups[c.ups.length - 1] : null; return c.prog || (u ? u.t : '') || ''; }
-  function hasDet(c){ return !!(c.req || c.prog || (c.ups && c.ups.length) || (c.todo && c.todo.length) || c.done || c.nextAll); }
+  function hasDet(c){ return !!(c.req || c.prog || (c.ups && c.ups.length) || (c.nts && c.nts.length) || (c.todo && c.todo.length) || c.done || c.nextAll); }
   function part(t, v){ return v ? '<h3>' + t + '</h3><p>' + esc(v) + '</p>' : ''; }
   function detail(c){
     var h = '';
@@ -278,6 +279,8 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
     if(c.todo && c.todo.length) h += '<h3>할 일</h3><ul>' + c.todo.map(function(x){ return '<li' + (x.d ? ' class="dn"' : '') + '>' + esc(x.t) + '</li>'; }).join('') + '</ul>';
     h += part('다음 할 일', c.nextAll);
     if(c.ups && c.ups.length) h += '<h3>진행 기록</h3><ul>' + c.ups.slice().reverse().map(function(u){ return '<li><span class="u">' + esc((u.at || '').slice(5).replace('-', '/')) + '</span>' + esc(u.t) + '</li>'; }).join('') + '</ul>';
+    if(c.nts && c.nts.length) h += '<h3>첨언</h3><ul>' + c.nts.slice().reverse().map(function(u){ return '<li><span class="u">' + esc((u.at || '').slice(5).replace('-', '/')) + '</span>' + esc(u.t) + '</li>'; }).join('') + '</ul>';
+    if(c.dr) h = '<p class="note" style="margin:0 0 6px">완료 승인을 기다리는 업무입니다. 승인은 노트북 프로그램에서 합니다.</p>' + h;
     if(c.done) h += part('완료 내용', c.done.sum) + part('전달 대상', c.done.to) + part('비고', c.done.notes);
     return h || '<p>내용이 없습니다.</p>';
   }
@@ -287,7 +290,7 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
     var brief = (c.req ? '<div class="brief"><i>내용</i>' + esc(clip(c.req, 70)) + '</div>' : '') + (lastProg(c) && c.stage !== 'done' ? '<div class="brief"><i>진행</i>' + esc(clip(lastProg(c), 80)) + '</div>' : '') + (c.done && c.done.sum ? '<div class="brief"><i>결과</i>' + esc(clip(c.done.sum, 80)) + '</div>' : '');
     var tap = hasDet(c) || c.hidden;
     var dl = (c.due && c.stage !== 'done') ? dleft(c.due) : null, urg = dl == null ? '' : dl < 0 ? ' lt' : dl <= 3 ? ' sn' : '';
-    return '<div class="row' + (tap ? ' tap' : '') + urg + '" data-id="' + esc(c.id) + '"><div class="body"><div class="t">' + esc(c.title) + '</div><div class="mline"><div class="m">' + who + esc(c.cat) + ' · ' + esc(STAGE_NAME[c.stage] || c.stage) + (c.no ? ' · ' + esc(c.no) : '') + '</div>' + dueChip(c) + '</div>' + brief + (c.next && c.stage !== 'done' ? '<div class="n"><i>다음</i>' + esc(c.next) + '</div>' : '') +
+    return '<div class="row' + (tap ? ' tap' : '') + urg + '" data-id="' + esc(c.id) + '"><div class="body"><div class="t">' + esc(c.title) + '</div><div class="mline"><div class="m">' + who + esc(c.cat) + ' · ' + esc(stName(c)) + (c.no ? ' · ' + esc(c.no) : '') + '</div>' + dueChip(c) + '</div>' + brief + (c.next && c.stage !== 'done' ? '<div class="n"><i>다음</i>' + esc(c.next) + '</div>' : '') +
       (tap ? '<div class="det">' + (c.hidden ? '<p>급여·평가 업무라서 제목만 보입니다. 노트북 프로그램 설정에서 바꿀 수 있습니다.</p>' : detail(c)) + '</div>' : '') + '</div>' + (tap ? CHEV : '') + '</div>';
   }
   function recRow(r){
@@ -339,12 +342,13 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
   }
   var PART = '을를은는이가에의도로와과';
   function advTok(t){ t = t.toLowerCase(); var out = [t]; if(t.length >= 3 && PART.indexOf(t.slice(-1)) >= 0) out.push(t.slice(0, -1)); return out; }
-  function advHay(x){ return [x.title, x.firm, (x.tags || []).join(' '), x.q, x.a, x.c, x.b, x.w].join(' ').toLowerCase(); }
+  function advRN(x){ return x.r === 'kr' ? '한국' : x.r === 'na' ? '북미' : ''; }
+  function advHay(x){ return [x.title, x.firm, advRN(x), (x.tags || []).join(' '), x.q, x.a, x.c, x.b, x.w].join(' ').toLowerCase(); }
   function advScore(x, toks){ var h = advHay(x), t = (x.title + ' ' + (x.tags || []).join(' ')).toLowerCase(), n = 0, all = true;
     toks.forEach(function(tk){ var f = advTok(tk), hit = f.some(function(w){ return h.indexOf(w) >= 0; }); if(hit){ n += 1 + (f.some(function(w){ return t.indexOf(w) >= 0; }) ? 1 : 0); } else all = false; });
     return {n:n, all:all}; }
   function advRow(x){
-    return '<div class="row tap" data-id="' + esc(x.id) + '"><div class="body"><div class="t">' + esc(x.title) + '</div><div class="mline"><div class="m">' + esc([x.date, x.firm].filter(Boolean).join(' · ')) + '</div></div>' +
+    return '<div class="row tap" data-id="' + esc(x.id) + '"><div class="body"><div class="t">' + esc(x.title) + '</div><div class="mline"><div class="m">' + esc([advRN(x), x.date, x.firm].filter(Boolean).join(' · ')) + '</div></div>' +
       ((x.tags && x.tags.length) ? '<div>' + x.tags.map(function(t){ return '<span class="tg">' + esc(t) + '</span>'; }).join('') + '</div>' : '') +
       (x.c ? '<div class="brief"><i>결론</i>' + esc(clip(x.c, 110)) + '</div>' : '') +
       '<div class="det">' + part('결론', x.c) + part('질문', x.q) + part('답변', x.a) + part('근거', x.b) + part('적용할 때 주의할 점', x.w) + '<p class="note" style="margin-top:10px">자문을 받은 날의 사실관계와 법령 기준입니다. 이번 사안과 다르거나 법이 바뀌었을 수 있으니 중요한 결정 전에는 노무사에게 다시 확인하세요.</p></div></div>' + CHEV + '</div>';
@@ -352,7 +356,7 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
   function advHTML(){
     if(!Array.isArray(D.adv)) return '<section class="sec"><div class="list"><div class="empty">노무 자문은 노트북 프로그램을 새 버전으로 열어 저장하면 나타납니다. 노트북 설정에서 끈 경우에도 나타나지 않습니다.</div></div></section>';
     var all = D.adv.slice().sort(function(a, b){ return String(b.date || '') < String(a.date || '') ? -1 : 1; }), cnt = {}, note = '';
-    all.forEach(function(x){ (x.tags || []).forEach(function(t){ cnt[t] = (cnt[t] || 0) + 1; }); });
+    var allA = all; all = advR ? allA.filter(function(x){ return advR === 'none' ? !x.r : x.r === advR; }) : allA; all.forEach(function(x){ (x.tags || []).forEach(function(t){ cnt[t] = (cnt[t] || 0) + 1; }); });
     var base = advF ? all.filter(function(x){ return (x.tags || []).indexOf(advF) >= 0; }) : all, list = base, toks = aq.trim().split(/\s+/).filter(Boolean);
     if(toks.length){
       var sc = base.map(function(x){ return {x:x, r:advScore(x, toks)}; }), full = sc.filter(function(e){ return e.r.all; });
@@ -360,7 +364,9 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
       else { list = sc.filter(function(e){ return e.r.n > 0; }).sort(function(a, b){ return b.r.n - a.r.n; }).map(function(e){ return e.x; }); if(list.length) note = '<div class="hint">모든 단어가 들어간 자문이 없어, 일부만 일치하는 자문을 보여 드립니다.</div>'; }
     }
     var tags = Object.keys(cnt).sort(function(a, b){ return cnt[b] - cnt[a]; });
-    return '<input class="search" id="aq" type="search" placeholder="상황이나 단어로 찾기 (예: 수습 본채용)" value="' + esc(aq) + '" aria-label="노무 자문 검색">' +
+    var nK = allA.filter(function(x){ return x.r === 'kr'; }).length, nN = allA.filter(function(x){ return x.r === 'na'; }).length, nU = allA.length - nK - nN;
+    var regs = '<div class="chips" id="arch">' + [['', '전체', allA.length], ['kr', '한국', nK], ['na', '북미', nN]].concat(nU ? [['none', '지역 미지정', nU]] : []).map(function(e){ return '<button data-ar="' + e[0] + '" aria-pressed="' + String(advR === e[0]) + '">' + e[1] + ' ' + e[2] + '</button>'; }).join('') + '</div>';
+    return regs + '<input class="search" id="aq" type="search" placeholder="상황이나 단어로 찾기 (예: 수습 본채용)" value="' + esc(aq) + '" aria-label="노무 자문 검색">' +
       '<div class="chips" id="achips"><button data-at="" aria-pressed="' + String(!advF) + '">전체 ' + all.length + '</button>' + tags.map(function(t){ return '<button data-at="' + esc(t) + '" aria-pressed="' + String(advF === t) + '">' + esc(t) + ' ' + cnt[t] + '</button>'; }).join('') + '</div>' + note +
       '<section class="sec"><div class="list">' + (list.length ? list.map(advRow).join('') : '<div class="empty">' + (all.length ? '조건에 맞는 자문이 없습니다.' : '보관한 노무 자문이 없습니다.') + '</div>') + '</div></section>' +
       '<p class="note">노트북 프로그램의 노무 자문 보관함에서 가져온 요약입니다. 원본 메일은 들어 있지 않습니다.' + (D.advHidden ? ' 민감으로 표시한 자문 ' + D.advHidden + '건은 이 기기에 넣지 않았습니다. 노트북에서 확인하세요.' : '') + '</p>';
@@ -434,6 +440,7 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
     var rl2 = $('reload2'); if(rl2) rl2.onclick = pick;
     var qi = $('q'); if(qi) qi.oninput = function(){ q = qi.value; var pos = qi.selectionStart; render(); var n = $('q'); n.focus(); try { n.setSelectionRange(pos, pos); } catch(e){} };
     var ai = $('aq'); if(ai) ai.oninput = function(){ aq = ai.value; var pos = ai.selectionStart; render(); var n = $('aq'); n.focus(); try { n.setSelectionRange(pos, pos); } catch(e){} };
+    var arch = $('arch'); if(arch) arch.onclick = function(e){ var b = e.target.closest('button'); if(!b) return; advR = b.getAttribute('data-ar'); advF = ''; render(); };
     var ach = $('achips'); if(ach) ach.onclick = function(e){ var b = e.target.closest('button'); if(!b) return; advF = b.getAttribute('data-at'); render(); };
     var ch = $('chips'); if(ch) ch.onclick = function(e){ var b = e.target.closest('button'); if(!b) return; stageF = b.getAttribute('data-st'); render(); };
     syncPane();
