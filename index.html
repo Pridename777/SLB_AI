@@ -128,6 +128,7 @@ details.mem .row:first-child{border-top:0}
 .sample{display:inline-block;background:var(--warn-weak);color:var(--warn);font-weight:700;font-size:12px;border-radius:999px;padding:1px 9px}
 input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 .cal{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 6px 8px;touch-action:pan-y}
+.cd .dots i.ms{background:#7c5cff}.cd .dots i.ms.late{background:var(--late)}
 .calf{display:flex;gap:8px;margin:0 4px 10px;flex-wrap:wrap}
 .calf select{flex:1;min-width:130px;min-height:40px;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:10px;padding:0 10px;font-size:14px}
 .bs{color:var(--warn);margin-right:3px;font-weight:700}
@@ -238,7 +239,7 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
       members:[{name:'팀원 가',title:'책임',memo:'교육, 조직문화'},{name:'팀원 나',title:'책임',memo:'평가'},{name:'팀원 다',title:'선임',memo:'급여, 평가'},{name:'팀원 라',title:'선임',memo:'급여, 교육'},{name:'팀원 마',title:'주임',memo:'채용'}],
       cards:[
         {id:'s1',no:'HR-0412',title:'리더십 과정 운영 안내문',cat:'교육·육성',stage:'approval',dr:1,owner:'팀원 가',collab:['팀원 라'],due:f(-2),next:'교육 일정 확정 후 안내문 발송',req:'리더 대상 교육 과정의 운영 일정과 참석 안내문을 만들어 주세요.',prog:'안내문 초안 작성 완료. 일정 확정을 기다리는 중.',todo:[{t:'일정 확정',d:false},{t:'안내문 발송',d:false}],ups:[{at:f(-5),t:'안내문 초안 작성'},{at:f(-3),t:'팀장 검토 요청'}]},
-        {id:'s2',boss:1,no:'HR-0415',title:'하반기 평가 일정 공지',cat:'평가·보상',stage:'writing',nts:[{at:f(-1),t:'제출처를 팀별 담당자로 바꾸는 방향으로 정리 예정'}],owner:'팀원 나',due:f(2),next:'평가 기간과 제출처 확인',req:'하반기 평가 일정을 전 직원에게 공지해야 합니다.',prog:'공지 문구 초안 작성 중.',ups:[{at:f(-1),t:'일정표 수령'}]},
+        {id:'s2',boss:1,ms:[{t:'팀별 의견 회신 확인',d:f(1)}],no:'HR-0415',title:'하반기 평가 일정 공지',cat:'평가·보상',stage:'writing',nts:[{at:f(-1),t:'제출처를 팀별 담당자로 바꾸는 방향으로 정리 예정'}],owner:'팀원 나',due:f(2),next:'평가 기간과 제출처 확인',req:'하반기 평가 일정을 전 직원에게 공지해야 합니다.',prog:'공지 문구 초안 작성 중.',ups:[{at:f(-1),t:'일정표 수령'}]},
         {id:'s3',no:'HR-0418',title:'급여 기준 점검 회신',cat:'급여',stage:'review',owner:'팀원 다',collab:['팀원 라','팀원 나'],due:f(9),next:'수당 기준 조항 대조',hidden:1},
         {id:'s4',no:'HR-0420',title:'신입 교육 계획',cat:'교육·육성',stage:'intake',owner:'팀원 라',due:f(15),next:'대상자와 교육 기간 확인',req:'신입 사원 교육 계획안 작성.',prog:'접수 완료. 대상자 확인 전.'},
         {id:'s5',no:'HR-0421',title:'생산직 채용공고 초안',cat:'채용',stage:'writing',owner:'팀원 마',due:f(4),next:'모집 요강과 근무 조건 정리',req:'생산직 채용공고 초안.',prog:'모집 요강 정리 중.'},
@@ -334,7 +335,12 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
     var cs = D.cards.filter(function(c){ return (c.due || (c.stage === 'done' ? (c.doneAt || '') : '')) === s && (calDone || c.stage !== 'done') && calPass(c); }), flt = !!(calOwn || calBoss);
     var rs = calDone && !flt ? (D.records || []).filter(function(r){ return r.date === s; }) : [];
     var ct = flt ? [] : (D.ev || []).filter(function(e){ return e.d === s; });
-    return {cs:cs, rs:rs, ct:ct, n:cs.length + rs.length + ct.length};
+    var ms = []; D.cards.forEach(function(c){ if(c.stage === 'done' || !calPass(c)) return; (c.ms || []).forEach(function(x){ if(x.d === s) ms.push({c:c, x:x}); }); });
+    return {cs:cs, rs:rs, ct:ct, ms:ms, n:cs.length + rs.length + ct.length + ms.length};
+  }
+  function msRow(o){
+    var n = dleft(o.x.d), chip = n == null ? '' : n < 0 ? '<span class="due late">' + (-n) + '일 지남</span>' : n === 0 ? '<span class="due soon">오늘</span>' : '<span class="due' + (n <= 3 ? ' soon' : '') + '">D-' + n + '</span>';
+    return '<div class="row"><div class="body"><div class="t">◆ ' + (o.c.boss ? '<span class="bs">★</span>' : '') + esc(o.x.t) + '</div><div class="mline"><div class="m"><span class="who">중간 일정</span> · ' + esc(o.c.title) + ' · 담당 ' + esc(o.c.owner || '미지정') + '</div>' + chip + '</div></div></div>';
   }
   function ctRow(e){
     var n = dleft(e.d), chip = n == null ? '' : n < 0 ? '<span class="due late">' + (-n) + '일 지남</span>' : n === 0 ? '<span class="due soon">오늘</span>' : '<span class="due' + (n <= 14 ? ' soon' : '') + '">D-' + n + '</span>';
@@ -348,15 +354,16 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
       var d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i), s = dstr(d), e = evOf(s), dots = '', k = 0;
       e.cs.forEach(function(c){ if(k++ < 4) dots += '<i class="' + (c.stage === 'done' ? 'done' : (c.due && dleft(c.due) < 0 ? 'late' : '')) + '"></i>'; });
       e.ct.forEach(function(){ if(k++ < 4) dots += '<i class="ct"></i>'; });
+      e.ms.forEach(function(o){ if(k++ < 4) dots += '<i class="ms' + (dleft(o.x.d) < 0 ? ' late' : '') + '"></i>'; });
       e.rs.forEach(function(){ if(k++ < 4) dots += '<i class="rec"></i>'; });
       if(e.n > 4) dots += '<s>+' + (e.n - 4) + '</s>';
       cells += '<button class="cd' + (d.getMonth() !== m - 1 ? ' out' : '') + (d.getDay() === 0 ? ' sun' : '') + (s === todayS ? ' today' : '') + (s === calD ? ' sel' : '') + '" data-cal="day:' + s + '" aria-label="' + (d.getMonth() + 1) + '월 ' + d.getDate() + '일 일정 ' + e.n + '건"><span class="n">' + d.getDate() + '</span><span class="dots">' + dots + '</span></button>';
       if(i === 34 && d.getMonth() !== m - 1) break;
     }
     var sel = evOf(calD), dp = calD.split('-'), sd = new Date(+dp[0], +dp[1] - 1, +dp[2]);
-    var rows = sel.cs.sort(byDue).map(function(c){ return row(c); }).join('') + sel.ct.map(ctRow).join('') + sel.rs.map(recRow).join('');
+    var rows = sel.cs.sort(byDue).map(function(c){ return row(c); }).join('') + sel.ms.map(msRow).join('') + sel.ct.map(ctRow).join('') + sel.rs.map(recRow).join('');
     return calFilterHTML() + '<div class="cal"><div class="calh"><button data-cal="prev" aria-label="이전 달">◀</button><b>' + y + '년 ' + m + '월</b><button data-cal="today">오늘</button><button data-cal="done" aria-pressed="' + String(calDone) + '">끝난 일</button><button data-cal="next" aria-label="다음 달">▶</button></div><div class="calg">' + cells + '</div>' +
-      '<div class="calleg"><span><i style="background:var(--accent)"></i>진행 중</span><span><i style="background:var(--late)"></i>마감 지남</span><span><i style="background:var(--ok)"></i>완료</span><span><i style="background:var(--warn)"></i>계약</span><span><i style="background:var(--sub)"></i>기록용</span></div></div>' +
+      '<div class="calleg"><span><i style="background:var(--accent)"></i>진행 중</span><span><i style="background:var(--late)"></i>마감 지남</span><span><i style="background:var(--ok)"></i>완료</span><span><i style="background:#7c5cff"></i>중간 일정</span><span><i style="background:var(--warn)"></i>계약</span><span><i style="background:var(--sub)"></i>기록용</span></div></div>' +
       '<section class="sec"><h2 id="dayhead">' + (sd.getMonth() + 1) + '월 ' + sd.getDate() + '일 (' + ['일','월','화','수','목','금','토'][sd.getDay()] + ') <em>' + sel.n + '</em></h2><div class="list">' + (rows || '<div class="empty">이 날 일정이 없습니다.</div>') + '</div></section>' +
       '<p class="note">업무 마감일을 달력에 보여 줍니다. 마감일이 없는 업무는 달력에 나오지 않습니다.' + (calOwn || calBoss ? ' 필터를 켜 두면 계약·기록용 일정은 숨깁니다.' : '') + (D.ev === undefined ? ' 계약 일정은 노트북 프로그램을 새 버전으로 열어 저장하면 나타납니다.' : '') + '</p>';
   }
@@ -433,7 +440,8 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
     var html = '';
     if(tab === 'urgent'){
       var appr = open.filter(function(c){ return c.stage === 'approval' && late.indexOf(c) < 0 && soon.indexOf(c) < 0; });
-      html = proxyHTML(open) + ((late.length || soon.length || appr.length) ? sec('마감 지남', late.sort(byDue)) + sec('3일 안에 마감', soon.sort(byDue)) + sec('승인 대기', appr.sort(byDue))
+      var msu = []; open.forEach(function(c){ (c.ms || []).forEach(function(x){ var n = dleft(x.d); if(n != null && n <= 3) msu.push({c:c, x:x}); }); }); msu.sort(function(a, b){ return a.x.d < b.x.d ? -1 : 1; });
+      html = proxyHTML(open) + (msu.length ? '<section class="sec"><h2>중간 일정 (지남·3일 안) <em>' + msu.length + '</em></h2><div class="list">' + msu.map(msRow).join('') + '</div></section>' : '') + ((late.length || soon.length || appr.length) ? sec('마감 지남', late.sort(byDue)) + sec('3일 안에 마감', soon.sort(byDue)) + sec('승인 대기', appr.sort(byDue))
         : '<div class="allclear">' + CHECK + '<b>급한 일이 없습니다</b><span>마감이 지났거나 3일 안에 끝나는 업무, 승인을 기다리는 업무가 없습니다.</span></div>');
     } else if(tab === 'cal'){
       html = calHTML();
