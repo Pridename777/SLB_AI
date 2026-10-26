@@ -201,13 +201,13 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
   .chev{display:none}
 }
 @media (prefers-reduced-motion:reduce){ .chev,details.mem summary::after{transition:none} }
-.rwb{display:inline-block;font-size:11px;font-weight:700;border-radius:999px;padding:1px 7px;margin-right:5px;background:#fff3d6;color:#8a5a00;vertical-align:1px}.wl .det{padding:4px 14px 12px}.wl .det h3{font-size:13px;margin:10px 0 4px}.wl .det ul{margin:0;padding-left:18px;font-size:13px;line-height:1.55}.wl .u{color:#8b95a1;font-size:12px;margin-right:4px}.wlx{padding:4px 14px 12px}.wlx h3{font-size:13px;margin:10px 0 4px}.wlx ul{margin:0;padding-left:18px;font-size:13px;line-height:1.55}.wlx p{font-size:13px;line-height:1.55;margin:6px 0}.wlx .u{color:#8b95a1;font-size:12px}</style>
+.rwb{display:inline-block;font-size:11px;font-weight:700;border-radius:999px;padding:1px 7px;margin-right:5px;background:#fff3d6;color:#8a5a00;vertical-align:1px}.wl .det{padding:4px 14px 12px}.wl .det h3{font-size:13px;margin:10px 0 4px}.wl .det ul{margin:0;padding-left:18px;font-size:13px;line-height:1.55}.wl .u{color:#8b95a1;font-size:12px;margin-right:4px}.wlx{padding:4px 14px 12px}.wlx h3{font-size:13px;margin:10px 0 4px}.wlx ul{margin:0;padding-left:18px;font-size:13px;line-height:1.55}.wlx p{font-size:13px;line-height:1.55;margin:6px 0}.wlx .u{color:#8b95a1;font-size:12px}.fpath{font-size:13px;word-break:break-all;margin:2px 0 6px;color:#333d4b}.fl{margin:0 0 4px;padding-left:18px;font-size:12.5px;color:#4e5968;word-break:break-all}.vw{position:fixed;inset:0;z-index:50;background:var(--bg,#fff);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0)}.vh{display:flex;gap:10px;align-items:center;padding:10px 16px;border-bottom:1px solid rgba(0,0,0,.08)}.vh b{flex:1;font-size:14px;word-break:break-all}.vb{flex:1;overflow:auto;padding:12px 16px 40px;-webkit-overflow-scrolling:touch}.vb pre{white-space:pre-wrap;word-break:break-word;font:13px/1.6 -apple-system,'Noto Sans KR',sans-serif;margin:0}</style>
 </head>
 <body>
 
 <div class="wrap">
   <header>
-    <div class="hd"><h1>인사팀 업무 현황</h1><button class="iconbtn" id="reload" hidden><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>새 파일</button></div>
+    <div class="hd"><h1>인사팀 업무 현황</h1><button class="iconbtn" id="openf" hidden><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>파일 열기</button><button class="iconbtn" id="reload" hidden><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>새 파일</button></div>
     <div class="stamp" id="stamp" hidden></div>
     <div id="top" hidden><div class="sum" id="sum"></div></div>
   </header>
@@ -263,6 +263,22 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
     r.readAsText(f);
   }
   function fail(msg){ var e = $('err'); if(!e){ D = null; render(); e = $('err'); } if(e) e.textContent = msg; }
+  function openFile(){ var f = $('vf'); if(!f){ f = document.createElement('input'); f.type = 'file'; f.id = 'vf'; f.hidden = true; f.onchange = function(){ if(f.files && f.files[0]) viewFile(f.files[0]); f.value = ''; }; document.body.appendChild(f); } f.click(); }
+  function closeView(){ var v = $('vw'); if(v){ if(v._u) URL.revokeObjectURL(v._u); v.remove(); } document.body.style.overflow = ''; }
+  function viewFile(file){
+    closeView(); var v = document.createElement('div'); v.id = 'vw'; v.className = 'vw'; var n = file.name || '', body = '', url = URL.createObjectURL(file); v._u = url;
+    var done = function(html){ v.innerHTML = '<div class="vh"><b>' + esc(n) + '</b><button class="btn sm" id="vx">닫기</button></div><div class="vb">' + html + '</div>'; document.body.appendChild(v); document.body.style.overflow = 'hidden'; $('vx').onclick = closeView; };
+    if(/\.(md|txt|json|csv|log)$/i.test(n)){
+      if(file.size > 2 * 1024 * 1024){ done('<p class="note">2MB가 넘는 글 파일은 미리보지 않습니다.</p><a class="btn sm" href="' + url + '" target="_blank">다른 앱으로 열기</a>'); return; }
+      var r = new FileReader(); r.onload = function(){ done('<pre>' + esc(String(r.result)) + '</pre>'); }; r.onerror = function(){ done('<p class="note">파일을 읽지 못했습니다.</p>'); }; r.readAsText(file, 'utf-8');
+    } else if(/\.(png|jpe?g|gif|webp|heic)$/i.test(n) || /^image\//.test(file.type)){
+      done('<img src="' + url + '" alt="' + esc(n) + '" style="max-width:100%">');
+    } else if(/\.pdf$/i.test(n)){
+      done('<iframe src="' + url + '" style="width:100%;height:78vh;border:0"></iframe><p class="note">PDF가 안 보이면 <a href="' + url + '" target="_blank">여기를 눌러 여세요</a>.</p>');
+    } else {
+      done('<p class="note">Word·Excel·PowerPoint 등은 이 화면에서 미리볼 수 없습니다. 파일 앱에서 해당 파일을 눌러 여세요.</p><a class="btn sm" href="' + url + '" target="_blank">열어 보기 시도</a>');
+    }
+  }
   function pick(){ $('file').value = ''; $('file').click(); }
 
   function dueChip(c){
@@ -278,7 +294,7 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
   function colab(c){ return (c.collab || []).filter(function(n){ return n && n !== c.owner; }); }
   function clip(t, n){ t = String(t || '').replace(/\s+/g, ' ').trim(); return t.length > n ? t.slice(0, n - 1) + '…' : t; }
   function lastProg(c){ var u = c.ups && c.ups.length ? c.ups[c.ups.length - 1] : null; return c.prog || (u ? u.t : '') || ''; }
-  function hasDet(c){ return !!(c.req || c.prog || (c.ups && c.ups.length) || (c.nts && c.nts.length) || (c.todo && c.todo.length) || c.done || c.nextAll); }
+  function hasDet(c){ return !!(c.fd || c.req || c.prog || (c.ups && c.ups.length) || (c.nts && c.nts.length) || (c.todo && c.todo.length) || c.done || c.nextAll); }
   function part(t, v){ return v ? '<h3>' + t + '</h3><p>' + esc(v) + '</p>' : ''; }
   function detail(c){
     var h = '';
@@ -291,6 +307,7 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
     h += part('다음 할 일', c.nextAll);
     if(c.ups && c.ups.length) h += '<h3>진행 기록</h3><ul>' + c.ups.slice().reverse().map(function(u){ return '<li><span class="u">' + esc((u.at || '').slice(5).replace('-', '/')) + '</span>' + esc(u.t) + '</li>'; }).join('') + '</ul>';
     if(c.nts && c.nts.length) h += '<h3>첨언</h3><ul>' + c.nts.slice().reverse().map(function(u){ return '<li><span class="u">' + esc((u.at || '').slice(5).replace('-', '/')) + '</span>' + esc(u.t) + '</li>'; }).join('') + '</ul>';
+    if(c.fd) h += '<h3>iCloud 파일 위치</h3><p class="fpath">SLB 폴더 › ' + esc(c.fd.split('/').join(' › ')) + '</p>' + ((c.fl && c.fl.length) || c.fr ? '<ul class="fl">' + (c.fr ? '<li>결과물/' + esc(c.fr) + '</li>' : '') + (c.fl || []).map(function(n){ return '<li>자료/' + esc(n) + '</li>'; }).join('') + '</ul>' : '') + '<p class="note" style="margin:4px 0 0">위 폴더는 파일 앱 › iCloud Drive에서 열 수 있습니다. 위쪽 "파일 열기"로 글·그림 파일을 바로 볼 수도 있습니다.</p>';
     if(c.dr) h = '<p class="note" style="margin:0 0 6px">완료 승인을 기다리는 업무입니다. 승인은 노트북 프로그램에서 합니다.</p>' + h;
     if(c.done) h += part(c.rw && c.rw.length && c.stage !== 'done' ? '이전 완료 내용' : '완료 내용', c.done.sum) + part('전달 대상', c.done.to) + part('비고', c.done.notes);
     if(c.rw && c.rw.length) h += '<h3>재작업 이력 (' + (c.rwn || c.rw.length) + '회)</h3><ul>' + c.rw.slice().reverse().map(function(u){ return '<li><span class="u">' + esc((u.at || '').slice(5).replace('-', '/')) + '</span>[' + esc(u.k || '') + '] ' + esc(u.t) + (u.prev ? ' <span class="u">· 이전 완료 ' + esc(u.prev.slice(5).replace('-', '/')) + '</span>' : '') + '</li>'; }).join('') + '</ul>';
@@ -443,7 +460,7 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
   function render(){
     var main = $('main'), top = $('top'), stamp = $('stamp');
     if(!D){
-      top.hidden = true; stamp.hidden = true; $('tabs').hidden = true; $('reload').hidden = true; document.body.classList.add('nodata'); $('pane').innerHTML = '';
+      top.hidden = true; stamp.hidden = true; $('tabs').hidden = true; $('reload').hidden = true; $('openf').hidden = true; document.body.classList.add('nodata'); $('pane').innerHTML = '';
       main.innerHTML = '<section class="hero"><h2>업무 현황 파일을 불러오세요</h2><p>이 화면은 조회 전용입니다. 노트북 프로그램이 저장한 파일을 이 기기 안에서만 읽어서 보여 주며, 어디로도 전송하지 않습니다.</p>' +
         '<ol><li>파일 앱에서 <b>iCloud Drive</b>의 업무 폴더를 엽니다.</li><li>맨 위의 <b>모바일_현황.json</b>을 선택합니다.</li></ol>' +
         '<button class="btn" id="pick">파일 선택</button> <button class="btn alt" id="demo">예시로 둘러보기</button><div class="err" id="err" role="alert"></div></section>' +
@@ -453,7 +470,7 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
     }
     var cards = D.cards.slice(), open = cards.filter(function(c){ return c.stage !== 'done'; });
     var late = open.filter(function(c){ return c.due && dleft(c.due) < 0; }), soon = open.filter(function(c){ var n = c.due ? dleft(c.due) : null; return n != null && n >= 0 && n <= 3; });
-    stamp.hidden = false; stamp.innerHTML = stampHTML(); top.hidden = false; $('tabs').hidden = false; $('reload').hidden = false; document.body.classList.remove('nodata');
+    stamp.hidden = false; stamp.innerHTML = stampHTML(); top.hidden = false; $('tabs').hidden = false; $('reload').hidden = false; $('openf').hidden = false; document.body.classList.remove('nodata');
     $('sum').innerHTML = '<button data-go="urgent" class="' + (late.length ? 'hot' : '') + '"><b>' + late.length + '</b><span>마감 지남</span></button><button data-go="urgent" class="' + (soon.length ? 'amb' : '') + '"><b>' + soon.length + '</b><span>3일 내 마감</span></button><button data-go="all"><b>' + open.length + '</b><span>진행 중</span></button>';
     $('tb-urgent').setAttribute('data-n', String(late.length + soon.length));
     ['urgent','cal','team','all','rec','adv'].forEach(function(t){ $('tb-' + t).setAttribute('aria-selected', String(tab === t)); });
@@ -496,6 +513,7 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
     }
     main.innerHTML = staleHTML() + html;
     var rl = $('reload'); if(rl) rl.onclick = pick;
+    var of = $('openf'); if(of) of.onclick = openFile;
     var rl2 = $('reload2'); if(rl2) rl2.onclick = pick;
     var qi = $('q'); if(qi) qi.oninput = function(){ q = qi.value; var pos = qi.selectionStart; render(); var n = $('q'); n.focus(); try { n.setSelectionRange(pos, pos); } catch(e){} };
     var ai = $('aq'); if(ai) ai.oninput = function(){ aq = ai.value; var pos = ai.selectionStart; render(); var n = $('aq'); n.focus(); try { n.setSelectionRange(pos, pos); } catch(e){} };
