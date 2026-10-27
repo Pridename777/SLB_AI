@@ -201,6 +201,7 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
   .chev{display:none}
 }
 @media (prefers-reduced-motion:reduce){ .chev,details.mem summary::after{transition:none} }
+a.fo{color:var(--accent,#1f5fbf);text-decoration:underline;word-break:break-all}a.fob{display:inline-block;text-decoration:none;border:1px solid var(--line);border-radius:10px;padding:7px 12px;font-size:14px}.lnk{background:none;border:0;padding:0;color:var(--accent,#1f5fbf);text-decoration:underline;font:inherit;cursor:pointer}
 .rwb{display:inline-block;font-size:11px;font-weight:700;border-radius:999px;padding:1px 7px;margin-right:5px;background:#fff3d6;color:#8a5a00;vertical-align:1px}.wl .det{padding:4px 14px 12px}.wl .det h3{font-size:13px;margin:10px 0 4px}.wl .det ul{margin:0;padding-left:18px;font-size:13px;line-height:1.55}.wl .u{color:#8b95a1;font-size:12px;margin-right:4px}.wlx{padding:4px 14px 12px}.wlx h3{font-size:13px;margin:10px 0 4px}.wlx ul{margin:0;padding-left:18px;font-size:13px;line-height:1.55}.wlx p{font-size:13px;line-height:1.55;margin:6px 0}.wlx .u{color:#8b95a1;font-size:12px}.fpath{font-size:13px;word-break:break-all;margin:2px 0 6px;color:#333d4b}.fl{margin:0 0 4px;padding-left:18px;font-size:12.5px;color:#4e5968;word-break:break-all}.vw{position:fixed;inset:0;z-index:50;background:var(--bg,#fff);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0)}.vh{display:flex;gap:10px;align-items:center;padding:10px 16px;border-bottom:1px solid rgba(0,0,0,.08)}.vh b{flex:1;font-size:14px;word-break:break-all}.vb{flex:1;overflow:auto;padding:12px 16px 40px;-webkit-overflow-scrolling:touch}.vb pre{white-space:pre-wrap;word-break:break-word;font:13px/1.6 -apple-system,'Noto Sans KR',sans-serif;margin:0}.md{font-size:14px;line-height:1.65}.md h2,.md h3,.md h4,.md h5{margin:14px 0 4px;line-height:1.35}.md h2{font-size:18px}.md h3{font-size:16px}.md h4,.md h5{font-size:14px}.md p{margin:3px 0}.md ul{margin:4px 0;padding-left:20px}.md blockquote{margin:6px 0;padding:2px 10px;border-left:3px solid #c9d1dc;color:#4e5968}.md code{background:#eef0f3;border-radius:4px;padding:0 4px;font-size:12.5px}.md .tr{font-size:12.5px;padding:3px 0;border-bottom:1px solid rgba(0,0,0,.06);word-break:break-word}</style>
 </head>
 <body>
@@ -209,7 +210,7 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
   <header>
     <div class="hd"><h1>인사팀 업무 현황</h1><button class="iconbtn" id="openf" hidden><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>파일 열기</button><button class="iconbtn" id="reload" hidden><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>새 파일</button></div>
     <div class="stamp" id="stamp" hidden></div>
-    <div id="top" hidden><div class="sum" id="sum"></div></div>
+    <div id="top" hidden><div class="sum" id="sum"></div><input class="search" id="gq" type="search" placeholder="전체 검색 (업무·기록·계약·회의록·노무 자문)" aria-label="전체 검색" style="margin-top:10px"></div>
   </header>
   <nav class="tabs" id="tabs" role="tablist" aria-label="보기" hidden><button role="tab" id="tb-urgent" aria-selected="true" data-tab="urgent"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg><span>급한 일</span></button><button role="tab" id="tb-cal" aria-selected="false" data-tab="cal"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v3"/><path d="M16 2v3"/><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M8 13h.01"/><path d="M12 13h.01"/><path d="M16 13h.01"/><path d="M8 17h.01"/><path d="M12 17h.01"/><path d="M16 17h.01"/></svg><span>일정</span></button><button role="tab" id="tb-team" aria-selected="false" data-tab="team"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.128a4 4 0 0 1 0 7.744"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg><span>팀원별</span></button><button role="tab" id="tb-all" aria-selected="false" data-tab="all"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h.01"/><path d="M3 12h.01"/><path d="M3 19h.01"/><path d="M8 5h13"/><path d="M8 12h13"/><path d="M8 19h13"/></svg><span>전체</span></button><button role="tab" id="tb-rec" aria-selected="false" data-tab="rec"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg><span>기록</span></button><button role="tab" id="tb-adv" aria-selected="false" data-tab="adv"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18"/><path d="m19 8 3 8a5 5 0 0 1-6 0zV7"/><path d="M3 7h1a17 17 0 0 0 8-2 17 17 0 0 0 8 2h1"/><path d="m5 8 3 8a5 5 0 0 1-6 0zV7"/><path d="M7 21h10"/></svg><span>노무</span></button></nav>
   <main id="main"></main>
@@ -315,6 +316,11 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
   function lastProg(c){ var u = c.ups && c.ups.length ? c.ups[c.ups.length - 1] : null; return c.prog || (u ? u.t : '') || ''; }
   function hasDet(c){ return !!(c.fd || c.req || c.prog || (c.ups && c.ups.length) || (c.nts && c.nts.length) || (c.todo && c.todo.length) || c.done || c.nextAll); }
   function part(t, v){ return v ? '<h3>' + t + '</h3><p>' + esc(v) + '</p>' : ''; }
+  /* v1.40 iPhone 파일 앱 바로 열기: 파일 앱의 shareddocuments:// 주소에 iCloud Drive 경로를 붙입니다(애플 비공식 방식, 실기기 확인 필요) */
+  var ROOTK = 'slb_m_root_v1';
+  function icRoot(){ try { var v = localStorage.getItem(ROOTK); if(v) return v; } catch(e){} return (D && D.root) || 'SLB_쟈비스'; }
+  function filesUrl(rel){ var p = (icRoot() + '/' + rel).split('/').filter(Boolean).map(function(x){ return encodeURIComponent(x.normalize ? x.normalize('NFC') : x); }).join('/'); return 'shareddocuments:///private/var/mobile/Library/Mobile%20Documents/com~apple~CloudDocs/' + p; }
+  function setRoot(){ var v = window.prompt('iCloud Drive 안에서 SLB 폴더의 위치를 적어 주세요 (예: SLB_쟈비스 또는 업무/SLB_쟈비스)', icRoot()); if(v == null) return; v = v.trim().replace(/^\/+|\/+$/g, ''); try { if(v) localStorage.setItem(ROOTK, v); else localStorage.removeItem(ROOTK); } catch(e){} render(); }
   function detail(c){
     var h = '';
     if(c.handler !== undefined && c.date !== undefined){
@@ -326,7 +332,9 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
     h += part('다음 할 일', c.nextAll);
     if(c.ups && c.ups.length) h += '<h3>진행 기록</h3><ul>' + c.ups.slice().reverse().map(function(u){ return '<li><span class="u">' + esc((u.at || '').slice(5).replace('-', '/')) + '</span>' + esc(u.t) + '</li>'; }).join('') + '</ul>';
     if(c.nts && c.nts.length) h += '<h3>첨언</h3><ul>' + c.nts.slice().reverse().map(function(u){ return '<li><span class="u">' + esc((u.at || '').slice(5).replace('-', '/')) + '</span>' + esc(u.t) + '</li>'; }).join('') + '</ul>';
-    if(c.fd) h += '<h3>iCloud 파일 위치</h3><p class="fpath">SLB 폴더 › ' + esc(c.fd.split('/').join(' › ')) + '</p>' + ((c.fl && c.fl.length) || c.fr ? '<ul class="fl">' + (c.fr ? '<li>결과물/' + esc(c.fr) + '</li>' : '') + (c.fl || []).map(function(n){ return '<li>자료/' + esc(n) + '</li>'; }).join('') + '</ul>' : '') + '<p class="note" style="margin:4px 0 0">위 폴더는 파일 앱 › iCloud Drive에서 열 수 있습니다. 위쪽 "파일 열기"로 글·그림 파일을 바로 볼 수도 있습니다.</p>';
+    if(c.fd) h += '<h3>iCloud 파일 위치</h3><p class="fpath">SLB 폴더 › ' + esc(c.fd.split('/').join(' › ')) + '</p>' + ((c.fl && c.fl.length) || c.fr ? '<ul class="fl">' + (c.fr ? '<li><a class="fo" href="' + esc(filesUrl(c.fd + '/결과물/' + c.fr)) + '">결과물/' + esc(c.fr) + '</a></li>' : '') + (c.fl || []).map(function(n){ return '<li><a class="fo" href="' + esc(filesUrl(c.fd + '/자료/' + n)) + '">자료/' + esc(n) + '</a></li>'; }).join('') + '</ul>' : '') +
+      '<p style="margin:6px 0 0"><a class="fo fob" href="' + esc(filesUrl(c.fd)) + '">이 업무 폴더를 파일 앱에서 열기</a></p>' +
+      '<p class="note" style="margin:4px 0 0">파일 이름을 누르면 iPhone 파일 앱에서 바로 엽니다(애플 공식 기능이 아닌 방식이라 안 열리면 위쪽 "파일 열기"로 고르세요). 기준 폴더: iCloud Drive › ' + esc(icRoot()) + ' <button class="lnk" data-root="1">바꾸기</button></p>';
     if(c.dr) h = '<p class="note" style="margin:0 0 6px">완료 승인을 기다리는 업무입니다. 승인은 노트북 프로그램에서 합니다.</p>' + h;
     if(c.done) h += part(c.rw && c.rw.length && c.stage !== 'done' ? '이전 완료 내용' : '완료 내용', c.done.sum) + part('전달 대상', c.done.to) + part('비고', c.done.notes);
     if(c.rw && c.rw.length) h += '<h3>재작업 이력 (' + (c.rwn || c.rw.length) + '회)</h3><ul>' + c.rw.slice().reverse().map(function(u){ return '<li><span class="u">' + esc((u.at || '').slice(5).replace('-', '/')) + '</span>[' + esc(u.k || '') + '] ' + esc(u.t) + (u.prev ? ' <span class="u">· 이전 완료 ' + esc(u.prev.slice(5).replace('-', '/')) + '</span>' : '') + '</li>'; }).join('') + '</ul>';
@@ -447,15 +455,17 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
   function byDue(a, b){ var x = a.due || '9999', y = b.due || '9999'; return x < y ? -1 : x > y ? 1 : 0; }
   var recK = 'rec';
   function recChips(){ var h = '<div class="chips" id="recchips">' + [['rec','끝난 일'],['mt','회의록'],['ct','계약']].map(function(x){ return '<button data-rk="' + x[0] + '" aria-pressed="' + String(recK === x[0]) + '">' + x[1] + '</button>'; }).join('') + '</div>'; setTimeout(function(){ var b = document.querySelectorAll('[data-rk]'); for(var i = 0; i < b.length; i++) b[i].onclick = function(){ recK = this.getAttribute('data-rk'); render(); }; }, 0); return h; }
+  function mtItem(m){ return '<details class="mem"><summary><div class="nm"><b>' + esc(m.title) + '</b><span>' + esc(m.date) + '</span></div><div class="cnt">할 일 ' + (m.act || []).length + '</div></summary><div class="det wlx">' +
+      (m.ov ? '<p>' + esc(m.ov) + '</p>' : '') + ((m.dec || []).length ? '<h3>결정</h3><ul>' + m.dec.map(function(t){ return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' : '') +
+      ((m.act || []).length ? '<h3>할 일</h3><ul>' + m.act.map(function(x){ return '<li>' + esc(x.w) + (x.o || x.d ? ' <span class="u">· ' + esc([x.o, x.d ? x.d.slice(5).replace('-', '/') : ''].filter(Boolean).join(' · ')) + '</span>' : '') + '</li>'; }).join('') + '</ul>' : '') + '</div></details>'; }
   function mtHTML(){
     var a = D.mt || []; if(!a.length) return '<div class="empty">회의록이 없습니다. 노트북 프로그램 설정 → 아이폰 조회용 파일에서 "회의록 요약도 넣기"를 켜고 저장하면 나타납니다.</div>';
-    return '<section class="sec"><div class="list">' + a.map(function(m){ return '<details class="mem"><summary><div class="nm"><b>' + esc(m.title) + '</b><span>' + esc(m.date) + '</span></div><div class="cnt">할 일 ' + (m.act || []).length + '</div></summary><div class="det wlx">' +
-      (m.ov ? '<p>' + esc(m.ov) + '</p>' : '') + ((m.dec || []).length ? '<h3>결정</h3><ul>' + m.dec.map(function(t){ return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' : '') +
-      ((m.act || []).length ? '<h3>할 일</h3><ul>' + m.act.map(function(x){ return '<li>' + esc(x.w) + (x.o || x.d ? ' <span class="u">· ' + esc([x.o, x.d ? x.d.slice(5).replace('-', '/') : ''].filter(Boolean).join(' · ')) + '</span>' : '') + '</li>'; }).join('') + '</ul>' : '') + '</div></details>'; }).join('') + '</div></section><p class="note">요약한 회의 최근 15건입니다.</p>';
+    return '<section class="sec"><div class="list">' + a.map(mtItem).join('') + '</div></section><p class="note">요약한 회의 최근 15건입니다.</p>';
   }
+  function ctItem(k){ return '<div class="row"><div class="body"><div class="t">' + esc(k.name) + '</div><div class="mline"><div class="m">' + esc([k.vendor, k.cat, k.auto, k.cost, k.owner ? '담당 ' + k.owner : ''].filter(Boolean).join(' · ')) + '</div><span class="due' + (k.lv === 'late' ? ' late' : k.lv === 'soon' ? ' soon' : '') + '">' + esc(k.end ? k.state : '종료일 없음') + '</span></div>' + (k.end ? '<div class="n"><i>종료</i>' + esc(k.end) + '</div>' : '') + '</div></div>'; }
   function ctHTML(){
     var a = D.ct || []; if(!a.length) return '<div class="empty">등록한 계약이 없거나, 노트북 프로그램을 새 버전으로 열어 저장하면 나타납니다.</div>';
-    return '<section class="sec"><div class="list">' + a.map(function(k){ return '<div class="row"><div class="body"><div class="t">' + esc(k.name) + '</div><div class="mline"><div class="m">' + esc([k.vendor, k.cat, k.auto, k.cost, k.owner ? '담당 ' + k.owner : ''].filter(Boolean).join(' · ')) + '</div><span class="due' + (k.lv === 'late' ? ' late' : k.lv === 'soon' ? ' soon' : '') + '">' + esc(k.end ? k.state : '종료일 없음') + '</span></div>' + (k.end ? '<div class="n"><i>종료</i>' + esc(k.end) + '</div>' : '') + '</div></div>'; }).join('') + '</div></section>';
+    return '<section class="sec"><div class="list">' + a.map(ctItem).join('') + '</div></section>';
   }
   function wlHTML(){
     var W = D.wl; if(!W || !((W.goals || []).length || (W.rules || []).length || (W.dec || []).length)) return '';
@@ -476,6 +486,24 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
     if(!(n >= 1)) return '';
     return '<div class="staleb" role="status"><div><b>' + n + '일 전 현황입니다</b><span>노트북에서 저장한 뒤 새 파일을 불러오세요.</span></div><button class="btn sm" id="reload2">불러오기</button></div>';
   }
+  /* v1.40 첫 화면 통합 검색: 업무·끝난 일·기록·계약·회의록·노무 자문·업무 일지를 한 번에 찾습니다 */
+  var gq = '';
+  function gsHTML(){
+    var toks = gq.toLowerCase().split(/\s+/).filter(Boolean), hit = function(h){ h = String(h || '').toLowerCase(); return toks.every(function(t){ return h.indexOf(t) >= 0; }); };
+    var cs = (D.cards || []).filter(function(c){ return hit([c.title, c.owner, colab(c).join(' '), c.cat, c.no, c.next, c.nextAll, c.req, c.prog, c.requester, (c.ups || []).map(function(u){ return u.t; }).join(' '), (c.nts || []).map(function(u){ return u.t; }).join(' '), (c.todo || []).map(function(u){ return u.t; }).join(' '), c.done ? c.done.sum + ' ' + (c.done.notes || '') : '', c.fd, (c.fl || []).join(' '), c.fr].join(' ')); });
+    var op = cs.filter(function(c){ return c.stage !== 'done'; }).sort(byDue), dn = cs.filter(function(c){ return c.stage === 'done'; });
+    var rs = (D.records || []).filter(function(r){ return hit([r.title, r.requester, r.handler, r.outcome, r.notes, r.kw, r.cat].join(' ')); });
+    var ks = (D.ct || []).filter(function(k){ return hit([k.name, k.vendor, k.cat, k.auto, k.owner, k.memo, k.state, k.end].join(' ')); });
+    var ms = (D.mt || []).filter(function(m){ return hit([m.title, m.date, m.ov, (m.dec || []).join(' '), (m.act || []).map(function(x){ return x.w + ' ' + (x.o || ''); }).join(' ')].join(' ')); });
+    var as = Array.isArray(D.adv) ? D.adv.filter(function(x){ return hit(advHay(x)); }) : [];
+    var W = D.wl || {}, wl = [].concat((W.goals || []).map(function(t){ return '목표 · ' + t; }), (W.rules || []).map(function(t){ return '지침 · ' + t; }), (W.dec || []).map(function(d){ return '결정 ' + (d.at || '').slice(5).replace('-', '/') + ' · ' + d.t + (d.card ? ' (' + d.card + ')' : ''); })).filter(hit);
+    var n = op.length + dn.length + rs.length + ks.length + ms.length + as.length + wl.length;
+    var g = function(t, arr, f){ return arr.length ? '<section class="sec"><h2>' + esc(t) + ' <em>' + arr.length + '</em></h2><div class="list">' + arr.slice(0, 40).map(f).join('') + '</div></section>' : ''; };
+    return '<p class="note" style="margin:0 0 8px">"' + esc(gq) + '" 전체 검색 ' + n + '건 <button class="lnk" id="gqx">검색 지우기</button></p>' +
+      (n ? g('진행 중 업무', op, function(c){ return row(c); }) + g('끝난 업무', dn, function(c){ return row(c); }) + g('기록', rs, recRow) + g('계약', ks, ctItem) + g('회의록', ms, mtItem) + g('노무 자문', as, advRow) +
+        (wl.length ? '<section class="sec"><h2>업무 일지 <em>' + wl.length + '</em></h2><div class="list"><div class="row"><div class="body"><ul style="margin:0;padding-left:18px">' + wl.map(function(t){ return '<li>' + esc(t) + '</li>'; }).join('') + '</ul></div></div></div></section>' : '')
+        : '<div class="empty">찾는 내용이 없습니다. 단어를 줄이거나 바꿔 보세요. (급여·평가 업무는 제목만, 회의록은 노트북 설정에서 켠 경우에만 들어 있습니다)</div>');
+  }
   function render(){
     var main = $('main'), top = $('top'), stamp = $('stamp');
     if(!D){
@@ -494,7 +522,9 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
     $('tb-urgent').setAttribute('data-n', String(late.length + soon.length));
     ['urgent','cal','team','all','rec','adv'].forEach(function(t){ $('tb-' + t).setAttribute('aria-selected', String(tab === t)); });
     var html = '';
-    if(tab === 'urgent'){
+    if(gq.trim()){
+      html = gsHTML();
+    } else if(tab === 'urgent'){
       var appr = open.filter(function(c){ return c.stage === 'approval' && late.indexOf(c) < 0 && soon.indexOf(c) < 0; });
       var msu = []; open.forEach(function(c){ (c.ms || []).forEach(function(x){ var n = dleft(x.d); if(n != null && n <= 3) msu.push({c:c, x:x}); }); }); msu.sort(function(a, b){ return a.x.d < b.x.d ? -1 : 1; });
       html = proxyHTML(open) + (msu.length ? '<section class="sec"><h2>중간 일정 (지남·3일 안) <em>' + msu.length + '</em></h2><div class="list">' + msu.map(msRow).join('') + '</div></section>' : '') + ((late.length || soon.length || appr.length) ? sec('마감 지남', late.sort(byDue)) + sec('3일 안에 마감', soon.sort(byDue)) + sec('승인 대기', appr.sort(byDue))
@@ -539,6 +569,7 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
     var arch = $('arch'); if(arch) arch.onclick = function(e){ var b = e.target.closest('button'); if(!b) return; advR = b.getAttribute('data-ar'); advF = ''; render(); };
     var ach = $('achips'); if(ach) ach.onclick = function(e){ var b = e.target.closest('button'); if(!b) return; advF = b.getAttribute('data-at'); render(); };
     var ch = $('chips'); if(ch) ch.onclick = function(e){ var b = e.target.closest('button'); if(!b) return; stageF = b.getAttribute('data-st'); render(); };
+    var gx = $('gqx'); if(gx) gx.onclick = function(){ gq = ''; var gi = $('gq'); if(gi) gi.value = ''; render(); };
     syncPane();
   }
   /* 아이패드 가로: 오른쪽 상세 화면 */
@@ -554,11 +585,13 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
     pane.innerHTML = '<div class="pt">' + (t ? t.innerHTML : '') + '</div>' + (ml ? ml.outerHTML : '') + '<div class="pd">' + (dt ? dt.innerHTML : '') + '</div>';
     pane.scrollTop = 0;
   }
-  document.querySelector('.tabs').addEventListener('click', function(e){ var b = e.target.closest('button'); if(!b) return; tab = b.getAttribute('data-tab'); render(); window.scrollTo(0, 0); });
+  document.querySelector('.tabs').addEventListener('click', function(e){ var b = e.target.closest('button'); if(!b) return; tab = b.getAttribute('data-tab'); if(gq){ gq = ''; $('gq').value = ''; } render(); window.scrollTo(0, 0); });
+  $('gq').addEventListener('input', function(){ gq = $('gq').value; render(); });
   $('sum').addEventListener('click', function(e){ var b = e.target.closest('[data-go]'); if(!b) return; tab = b.getAttribute('data-go'); if(tab === 'all') stageF = ''; render(); window.scrollTo(0, 0); });
   $('main').addEventListener('change', function(e){ var t = e.target.closest('[data-calf]'); if(!t) return; if(t.getAttribute('data-calf') === 'own') calOwn = t.value; else calBoss = t.value === '1'; render(); });
   $('main').addEventListener('click', function(e){ var b = e.target.closest('[data-cal]'); if(b){ calClick(b.getAttribute('data-cal')); } });
-  $('main').addEventListener('click', function(e){ var r = e.target.closest('.row.tap'); if(!r) return; if(isWide()){ selId = r.getAttribute('data-id') || ''; syncPane(); } else r.classList.toggle('open'); });
+  document.addEventListener('click', function(e){ if(e.target.closest && e.target.closest('[data-root]')){ e.preventDefault(); setRoot(); } });
+  $('main').addEventListener('click', function(e){ if(e.target.closest('a.fo, [data-root]')) return; var r = e.target.closest('.row.tap'); if(!r) return; if(isWide()){ selId = r.getAttribute('data-id') || ''; syncPane(); } else r.classList.toggle('open'); });
   /* 달력에서 좌우로 밀면 달 이동 */
   var tx = 0, ty = 0, tok = false;
   $('main').addEventListener('touchstart', function(e){ var t = e.touches[0]; tx = t.clientX; ty = t.clientY; tok = !!e.target.closest('.cal'); }, {passive:true});
