@@ -1,91 +1,178 @@
 <!doctype html>
 <html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>SLB 연결 테스트</title>
+<title>쟈비스로 보내기</title>
 <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
 <style>
 body{font:13px/1.5 "Malgun Gothic",sans-serif;margin:0;padding:12px;color:#1b1f27}
-h1{font-size:15px;margin:0 0 8px}
-.row{display:grid;grid-template-columns:78px 1fr;gap:2px 8px;margin:4px 0}
-.k{color:#6b7684}.ok{color:#17803d;font-weight:700}.ng{color:#c62828;font-weight:700}
-pre{white-space:pre-wrap;word-break:break-word;background:#f4f6f9;border:1px solid #dde2ea;border-radius:6px;padding:8px;max-height:140px;overflow:auto;font:12px/1.5 inherit}
+h1{font-size:15px;margin:0 0 6px}
+h2{font-size:13px;margin:0 0 6px}
+.row{display:grid;grid-template-columns:64px 1fr;gap:2px 8px;margin:2px 0}
+.k{color:#6b7684}.ok{color:#17803d;font-weight:700}.ng{color:#c62828;font-weight:700}.warn{color:#9a6700}
 button{font:inherit;padding:6px 10px;border:1px solid #bcc5d1;border-radius:6px;background:#fff;cursor:pointer;margin:6px 6px 0 0}
 button.pri{background:#2456d6;color:#fff;border-color:#2456d6}
+button:disabled{opacity:.5;cursor:default}
+button.x{border:0;background:none;color:#c62828;padding:0 4px;margin:0;font-weight:700}
+input[type=password],input[type=text],textarea{font:inherit;width:100%;box-sizing:border-box;border:1px solid #bcc5d1;border-radius:6px;padding:6px 8px}
+textarea{min-height:52px;resize:vertical}
 .box{border-top:1px solid #e3e7ee;margin-top:10px;padding-top:8px}
+.bk{list-style:none;margin:6px 0 0;padding:0}
+.bk li{display:flex;gap:6px;align-items:flex-start;border:1px solid #e3e7ee;border-radius:6px;padding:5px 6px;margin-top:4px;background:#f8f9fb}
+.bk li span{flex:1;min-width:0;word-break:break-all}
+#st{margin-bottom:6px}
+small{color:#6b7684}
 </style></head><body>
-<h1>SLB 연결 테스트</h1>
-<div id="st" class="k">Outlook에 연결하는 중…</div>
-<div id="info" hidden>
-  <div class="row"><span class="k">제목</span><span id="subj"></span></div>
-  <div class="row"><span class="k">보낸 사람</span><span id="from"></span></div>
-  <div class="row"><span class="k">받은 날짜</span><span id="date"></span></div>
-  <div class="row"><span class="k">첨부</span><span id="att"></span></div>
-  <div class="row"><span class="k">본문</span><span id="blen"></span></div>
-  <pre id="body"></pre>
-  <div class="box">
-    <b>넘기는 방법 확인</b><br>
-    <button class="pri" id="copy">메일 내용 복사</button>
-    <button id="ping">내 PC 도우미 응답 확인</button>
+<h1>쟈비스로 보내기</h1>
+<div id="conn" class="k">도우미 연결 확인 중…</div>
+
+<div id="keyBox" class="box" hidden>
+  <h2>처음 한 번: 연결 키 넣기</h2>
+  <small>PC에서 "SLB도우미_실행"을 켜면 창에 나오는 연결 키를 붙여넣으세요. 이 키는 이 PC의 Outlook에만 저장됩니다.</small>
+  <input type="password" id="keyIn" placeholder="연결 키" style="margin-top:6px">
+  <button class="pri" id="keySave">저장하고 연결 확인</button>
+</div>
+
+<div class="box">
+  <h2>지금 선택한 메일</h2>
+  <div id="st" class="k">Outlook에 연결하는 중…</div>
+  <div id="info" hidden>
+    <div class="row"><span class="k">제목</span><span id="subj"></span></div>
+    <div class="row"><span class="k">보낸 사람</span><span id="from"></span></div>
+    <div class="row"><span class="k">날짜</span><span id="date"></span></div>
+    <div class="row"><span class="k">첨부</span><span id="att"></span></div>
+    <label style="display:flex;gap:6px;align-items:center;margin-top:4px"><input type="checkbox" id="optImg" checked> 본문에 붙은 그림도 보내기 <small>(4KB 미만 서명 그림은 뺍니다)</small></label>
+    <button class="pri" id="add">담기</button>
+    <button id="sendOne">이 메일만 바로 보내기</button>
+    <button id="copy">내용 복사</button>
     <div id="res" class="k" style="margin-top:6px"></div>
   </div>
-  <div class="box">
-    <b>첨부·그림 읽기 확인</b><br>
-    <button class="pri" id="atts">첨부·그림 읽어 보기</button>
-    <div id="ares" class="k" style="margin-top:6px"></div>
-    <div id="alist"></div>
-  </div>
 </div>
+
+<div class="box">
+  <h2>담은 메일 <span id="bkN"></span></h2>
+  <small>관련된 메일을 하나씩 선택해 "담기"를 누른 뒤 한 번에 보내세요. 이 창이 닫혀도 담은 메일은 PC 도우미에 남아 있습니다.</small>
+  <ul class="bk" id="bk"></ul>
+  <label class="k" for="note" style="display:block;margin-top:6px">쟈비스에게 한마디 (선택)</label>
+  <textarea id="note" placeholder="예: 노무 자문으로 정리해 줘 / 교육 결과 보고 업무로 접수"></textarea>
+  <button class="pri" id="send" disabled>담은 메일 보내기</button>
+  <div id="sres" class="k" style="margin-top:6px"></div>
+</div>
+
 <script>
-const $ = id => document.getElementById(id);
-Office.onReady(info => {
-  if(info.host !== Office.HostType.Outlook){ $('st').innerHTML = '<span class="ng">Outlook이 아닌 곳에서 열렸습니다.</span> 이 페이지는 Outlook 안에서만 동작합니다.'; return; }
-  const it = Office.context.mailbox.item;
-  if(!it){ $('st').innerHTML = '<span class="ng">열어 둔 메일이 없습니다.</span> 메일을 하나 선택한 뒤 다시 누르세요.'; return; }
-  $('st').innerHTML = '<span class="ok">Outlook에 연결됐습니다.</span> (Outlook ' + (Office.context.diagnostics ? Office.context.diagnostics.version : '?') + ')';
-  $('info').hidden = false;
-  $('subj').textContent = it.subject || '(제목 없음)';
-  const f = it.from; $('from').textContent = f ? ((f.displayName || '') + ' <' + (f.emailAddress || '') + '>') : '(알 수 없음)';
-  const d = it.dateTimeCreated; $('date').textContent = d ? new Date(d).toLocaleString('ko-KR') : '(알 수 없음)';
-  const at = it.attachments || []; $('att').textContent = at.length ? at.length + '개: ' + at.map(a => a.name).join(', ') : '없음';
-  it.body.getAsync(Office.CoercionType.Text, r => {
-    if(r.status !== Office.AsyncResultStatus.Succeeded){ $('blen').innerHTML = '<span class="ng">본문을 읽지 못했습니다: ' + (r.error && r.error.message || '') + '</span>'; return; }
-    const t = r.value || ''; window.__body = t;
-    $('blen').innerHTML = '<span class="ok">읽음</span> · ' + t.length.toLocaleString() + '자'; $('body').textContent = t.slice(0, 600) + (t.length > 600 ? ' …' : '');
-  });
-});
+const BR = 'http://127.0.0.1:8771', $ = id => document.getElementById(id);
+const lsG = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : v; } catch(e){ return d; } };
+const lsS = (k, v) => { try { if(v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch(e){} };
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c]));
+let busy = false, bridgeOk = false;
+
+async function br(method, path, body){
+  const h = {'x-bridge-key':lsG('slbBridgeKey', '')}; if(body) h['content-type'] = 'application/json';
+  let r;
+  try { r = await fetch(BR + path, {method, headers:h, body:body ? JSON.stringify(body) : undefined, cache:'no-store'}); }
+  catch(e){ throw new Error('PC 도우미에 연결하지 못했습니다. "SLB도우미_실행"이 켜져 있는지 확인하세요.'); }
+  const d = await r.json().catch(() => ({}));
+  if(r.status === 401) throw new Error('연결 키가 맞지 않습니다. 도우미 창에 나온 키를 다시 넣어 주세요.');
+  if(r.status === 403) throw new Error('도우미가 이 추가 기능을 받지 않습니다. 도우미를 새 버전(v1.4)으로 바꾸고 다시 켜 주세요.');
+  if(!r.ok) throw new Error(d.error || ('도우미 오류 ' + r.status));
+  return d;
+}
+async function checkConn(){
+  if(!lsG('slbBridgeKey', '')){ $('keyBox').hidden = false; $('conn').innerHTML = '<span class="warn">연결 키를 먼저 넣어 주세요.</span>'; bridgeOk = false; return; }
+  try {
+    const d = await br('GET', '/ping');
+    if(!d.inbox){ throw new Error('도우미가 옛 버전(v' + (d.bridge || '?') + ')입니다. v1.4로 바꾸고 다시 켜 주세요.'); }
+    bridgeOk = true; $('keyBox').hidden = true; $('conn').innerHTML = '<span class="ok">PC 도우미 연결됨</span> <small>v' + esc(d.bridge) + '</small> <button id="keyRe" style="margin:0 0 0 6px;padding:1px 6px;font-size:11px">키 바꾸기</button>';
+    $('keyRe').onclick = () => { $('keyBox').hidden = false; };
+    loadBasket();
+  } catch(e){ bridgeOk = false; $('conn').innerHTML = '<span class="ng">' + esc(e.message) + '</span> <button id="reTry" style="margin:0 0 0 6px;padding:1px 6px;font-size:11px">다시 확인</button>'; $('reTry').onclick = checkConn; if(/연결 키/.test(e.message)) $('keyBox').hidden = false; }
+  syncBtns();
+}
+$('keySave').onclick = () => { const k = $('keyIn').value.trim(); if(k.length < 16){ $('conn').innerHTML = '<span class="ng">연결 키가 너무 짧습니다.</span>'; return; } lsS('slbBridgeKey', k); $('keyIn').value = ''; checkConn(); };
+
+/* ---------- 메일 → .eml 만들기 ---------- */
+function b64u(s){ const by = new TextEncoder().encode(String(s || '')); let bin = ''; for(let i = 0; i < by.length; i += 0x8000) bin += String.fromCharCode.apply(null, by.subarray(i, i + 0x8000)); return btoa(bin); }
+const word = s => '=?UTF-8?B?' + b64u(s) + '?=';
+const wrap = b => b.replace(/\s+/g, '').replace(/.{1,76}/g, '$&\r\n');
+const addr = e => e ? (e.displayName ? word(e.displayName) + ' ' : '') + '<' + (e.emailAddress || '') + '>' : '';
+const getBody = (it, t) => new Promise(res => it.body.getAsync(t, r => res(r.status === Office.AsyncResultStatus.Succeeded ? (r.value || '') : '')));
+const getAtt = (it, id) => new Promise(res => it.getAttachmentContentAsync(id, r => res(r)));
+async function buildEml(it){
+  const text = await getBody(it, Office.CoercionType.Text), B = '----slb' + Math.random().toString(36).slice(2), notes = [], names = new Set(), atts = [];
+  const canRead = !!it.getAttachmentContentAsync && Office.context.requirements.isSetSupported('Mailbox', '1.8');
+  let parts = '';
+  for(const a of (it.attachments || [])){
+    if(a.isInline && (!$('optImg').checked || (a.size || 0) < 4096)) continue;
+    if(a.attachmentType !== Office.MailboxEnums.AttachmentType.File){ notes.push(a.name + '(메일·항목 첨부라 뺌)'); continue; }
+    if((a.size || 0) > 15 * 1024 * 1024){ notes.push(a.name + '(15MB 초과로 뺌)'); continue; }
+    if(!canRead){ notes.push(a.name + '(이 Outlook은 첨부 읽기를 지원하지 않음)'); continue; }
+    const r = await getAtt(it, a.id);
+    if(r.status !== Office.AsyncResultStatus.Succeeded || !r.value || r.value.format !== Office.MailboxEnums.AttachmentContentFormat.Base64){ notes.push(a.name + '(읽지 못함)'); continue; }
+    let nm = a.name || 'file', k = 1; const dot = nm.lastIndexOf('.'); while(names.has(nm)){ k++; nm = dot > 0 ? a.name.slice(0, dot) + '-' + k + a.name.slice(dot) : a.name + '-' + k; } names.add(nm);
+    atts.push(nm);
+    parts += '--' + B + '\r\nContent-Type: ' + (a.contentType || 'application/octet-stream') + '; name="' + word(nm) + '"\r\nContent-Transfer-Encoding: base64\r\nContent-Disposition: attachment; filename="' + word(nm) + '"\r\n\r\n' + wrap(r.value.content) + '\r\n';
+  }
+  const d = it.dateTimeCreated ? new Date(it.dateTimeCreated) : new Date();
+  const eml = 'MIME-Version: 1.0\r\nFrom: ' + addr(it.from) + '\r\nTo: ' + (it.to || []).map(addr).join(', ') + '\r\n' + ((it.cc || []).length ? 'Cc: ' + it.cc.map(addr).join(', ') + '\r\n' : '') +
+    'Subject: ' + word(it.subject || '(제목 없음)') + '\r\nDate: ' + d.toUTCString() + '\r\nContent-Type: multipart/mixed; boundary="' + B + '"\r\n\r\n' +
+    '--' + B + '\r\nContent-Type: text/plain; charset="utf-8"\r\nContent-Transfer-Encoding: base64\r\n\r\n' + wrap(b64u(text)) + '\r\n' + parts + '--' + B + '--\r\n';
+  return {eml, atts, notes, meta:{key:it.itemId || (it.subject + '|' + d.toISOString()), subject:it.subject || '(제목 없음)', from:it.from ? (it.from.displayName || it.from.emailAddress) : '', date:d.toLocaleString('ko-KR'), atts}};
+}
+
+/* ---------- 담기·보내기 ---------- */
+function renderBasket(b){
+  const ms = (b && b.mails) || [];
+  $('bkN').textContent = ms.length ? ms.length + '통' : '';
+  $('bk').innerHTML = ms.length ? ms.map(m => '<li><span><b>' + esc(m.subject) + '</b><br><small>' + esc(m.from) + ' · ' + esc(m.date) + (m.atts && m.atts.length ? ' · 첨부 ' + m.atts.length : '') + '</small></span><button class="x" data-k="' + esc(m.key) + '" title="빼기">×</button></li>').join('') : '<li><small>아직 담은 메일이 없습니다.</small></li>';
+  document.querySelectorAll('#bk [data-k]').forEach(x => x.onclick = async () => { try { renderBasket(await br('POST', '/inbox/remove', {draft:lsG('slbDraft', ''), key:x.dataset.k})); } catch(e){ $('sres').innerHTML = '<span class="ng">' + esc(e.message) + '</span>'; } });
+  $('send').dataset.n = ms.length; syncBtns();
+}
+async function loadBasket(){
+  const id = lsG('slbDraft', ''); if(!id){ renderBasket(null); return; }
+  try { const b = await br('GET', '/inbox/draft?id=' + encodeURIComponent(id)); if(b.status !== 'draft') lsS('slbDraft', null); renderBasket(b); } catch(e){ renderBasket(null); }
+}
+function syncBtns(){
+  const has = !!(window.Office && Office.context && Office.context.mailbox && Office.context.mailbox.item);
+  $('add').disabled = busy || !bridgeOk || !has; $('sendOne').disabled = busy || !bridgeOk || !has; $('send').disabled = busy || !bridgeOk || !(+$('send').dataset.n > 0);
+}
+async function addCurrent(){
+  const it = Office.context.mailbox.item; if(!it) return null;
+  $('res').textContent = '메일과 첨부를 읽는 중…';
+  const m = await buildEml(it);
+  if(m.eml.length > 44 * 1024 * 1024) throw new Error('메일이 너무 큽니다(첨부 포함 약 30MB 이하만 보낼 수 있습니다).');
+  const b = await br('POST', '/inbox/add', {draft:lsG('slbDraft', ''), mail:Object.assign({eml:m.eml}, m.meta)});
+  lsS('slbDraft', b.id); renderBasket(b);
+  $('res').innerHTML = (b.dup ? '<span class="warn">이미 담은 메일입니다.</span>' : '<span class="ok">담았습니다.</span>') + (m.atts.length ? ' 첨부·그림 ' + m.atts.length + '개 포함.' : '') + (m.notes.length ? '<br><span class="warn">뺀 것: ' + esc(m.notes.join(', ')) + '</span>' : '');
+  return b;
+}
+async function sendDraft(){
+  const b = await br('POST', '/inbox/send', {draft:lsG('slbDraft', ''), note:$('note').value.trim()});
+  lsS('slbDraft', null); $('note').value = ''; renderBasket(null);
+  $('sres').innerHTML = '<span class="ok">' + b.mails.length + '통을 쟈비스로 보냈습니다.</span> 쟈비스 왼쪽 메뉴 "받은 메일"에서 확인하세요.';
+}
+const run = fn => async () => { if(busy) return; busy = true; syncBtns(); $('sres').textContent = ''; try { await fn(); } catch(e){ $('res').innerHTML = '<span class="ng">' + esc(e.message || e) + '</span>'; } busy = false; syncBtns(); };
+$('add').onclick = run(addCurrent);
+$('sendOne').onclick = run(async () => { const b = await addCurrent(); if(b) await sendDraft(); });
+$('send').onclick = run(sendDraft);
 $('copy').onclick = async () => {
-  const it = Office.context.mailbox.item, f = it.from || {};
-  const txt = '제목: ' + (it.subject || '') + '\n보낸 사람: ' + (f.displayName || '') + ' <' + (f.emailAddress || '') + '>\n날짜: ' + (it.dateTimeCreated ? new Date(it.dateTimeCreated).toISOString().slice(0, 16).replace('T', ' ') : '') + '\n\n' + (window.__body || '');
-  try { await navigator.clipboard.writeText(txt); $('res').innerHTML = '<span class="ok">복사했습니다.</span> 메모장에 붙여넣어 확인하세요.'; }
-  catch(e){ const ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select(); let ok = false; try { ok = document.execCommand('copy'); } catch(_){} ta.remove(); $('res').innerHTML = ok ? '<span class="ok">복사했습니다.</span> 메모장에 붙여넣어 확인하세요.' : '<span class="ng">복사하지 못했습니다.</span> ' + (e.message || ''); }
-};
-$('ping').onclick = async () => {
-  $('res').textContent = '확인 중…';
-  try { const r = await fetch('http://127.0.0.1:8771/ping', {cache:'no-store'}); $('res').innerHTML = '<span class="ok">도우미가 응답했습니다</span> (코드 ' + r.status + '). 401·403이면 정상입니다(연결 키를 보내지 않아서).'; }
-  catch(e){ $('res').innerHTML = '<span class="ng">응답이 없습니다.</span> 도우미를 켜지 않았거나, Outlook이 이 주소로의 연결을 막았을 수 있습니다. (' + (e.message || e) + ')'; }
+  const it = Office.context.mailbox.item; if(!it) return; const f = it.from || {}, t = await getBody(it, Office.CoercionType.Text);
+  const txt = '제목: ' + (it.subject || '') + '\n보낸 사람: ' + (f.displayName || '') + ' <' + (f.emailAddress || '') + '>\n날짜: ' + (it.dateTimeCreated ? new Date(it.dateTimeCreated).toLocaleString('ko-KR') : '') + '\n\n' + t;
+  try { await navigator.clipboard.writeText(txt); $('res').innerHTML = '<span class="ok">복사했습니다.</span>'; }
+  catch(e){ const ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select(); let ok = false; try { ok = document.execCommand('copy'); } catch(_){} ta.remove(); $('res').innerHTML = ok ? '<span class="ok">복사했습니다.</span>' : '<span class="ng">복사하지 못했습니다.</span>'; }
 };
 
-$('atts').onclick = async () => {
-  const it = Office.context.mailbox.item, out = $('ares'), list = $('alist'); list.innerHTML = '';
-  if(!Office.context.requirements.isSetSupported('Mailbox', '1.8') || !it.getAttachmentContentAsync){ out.innerHTML = '<span class="ng">이 Outlook은 첨부 내용 읽기(Mailbox 1.8)를 지원하지 않습니다.</span>'; return; }
-  out.textContent = '읽는 중…';
-  // 본문(HTML) 안의 그림 개수
-  const html = await new Promise(res => it.body.getAsync(Office.CoercionType.Html, r => res(r.status === Office.AsyncResultStatus.Succeeded ? r.value : '')));
-  const imgs = (html.match(/<img\b/gi) || []).length, cids = (html.match(/src=["']cid:/gi) || []).length;
-  const at = (it.attachments || []).slice(0, 8); let ok = 0, ng = 0;
-  const lines = [];
-  for(const a of at){
-    const row = document.createElement('div'); row.style.cssText = 'border-top:1px solid #e3e7ee;margin-top:6px;padding-top:6px';
-    const head = (a.isInline ? '[본문 그림] ' : '[첨부] ') + a.name + ' · ' + (a.contentType || '?') + ' · ' + Math.round((a.size || 0) / 1024) + 'KB';
-    if(a.attachmentType !== Office.MailboxEnums.AttachmentType.File){ row.innerHTML = head + '<br><span class="ng">파일이 아닌 첨부(메일·항목)라 읽지 않았습니다.</span>'; ng++; list.appendChild(row); continue; }
-    if((a.size || 0) > 15 * 1024 * 1024){ row.innerHTML = head + '<br><span class="ng">15MB를 넘어 건너뛰었습니다.</span>'; ng++; list.appendChild(row); continue; }
-    const r = await new Promise(res => it.getAttachmentContentAsync(a.id, x => res(x)));
-    if(r.status === Office.AsyncResultStatus.Succeeded && r.value && r.value.content){
-      ok++; const v = r.value, kb = Math.round((v.format === Office.MailboxEnums.AttachmentContentFormat.Base64 ? v.content.length * 0.75 : v.content.length) / 1024);
-      row.innerHTML = head + '<br><span class="ok">내용 읽음</span> (' + v.format + ', 약 ' + kb + 'KB)';
-      if(v.format === Office.MailboxEnums.AttachmentContentFormat.Base64 && /^image\//i.test(a.contentType || '')){ const im = document.createElement('img'); im.src = 'data:' + a.contentType + ';base64,' + v.content; im.style.cssText = 'display:block;max-width:100%;max-height:120px;margin-top:4px;border:1px solid #dde2ea'; row.appendChild(im); }
-    } else { ng++; row.innerHTML = head + '<br><span class="ng">읽지 못했습니다: ' + ((r.error && r.error.message) || '') + '</span>'; }
-    list.appendChild(row);
-  }
-  out.innerHTML = '본문 안 그림 ' + imgs + '개(메일 첨부형 ' + cids + '개) · 첨부 ' + (it.attachments || []).length + '개 중 <span class="ok">읽음 ' + ok + '</span>' + (ng ? ' · <span class="ng">못 읽음 ' + ng + '</span>' : '');
-};
+function showItem(){
+  const it = Office.context.mailbox.item;
+  if(!it){ $('st').innerHTML = '<span class="warn">메일을 하나 선택하세요.</span>'; $('info').hidden = true; syncBtns(); return; }
+  $('st').innerHTML = ''; $('info').hidden = false; $('res').textContent = '';
+  $('subj').textContent = it.subject || '(제목 없음)';
+  const f = it.from; $('from').textContent = f ? ((f.displayName || '') + ' <' + (f.emailAddress || '') + '>') : '(알 수 없음)';
+  $('date').textContent = it.dateTimeCreated ? new Date(it.dateTimeCreated).toLocaleString('ko-KR') : '';
+  const at = (it.attachments || []), fl = at.filter(a => !a.isInline), il = at.filter(a => a.isInline);
+  $('att').textContent = (fl.length ? '파일 ' + fl.length + '개' : '파일 없음') + (il.length ? ' · 본문 그림 ' + il.length + '개' : '');
+  syncBtns();
+}
+Office.onReady(info => {
+  if(info.host !== Office.HostType.Outlook){ $('st').innerHTML = '<span class="ng">Outlook이 아닌 곳에서 열렸습니다.</span> 이 페이지는 Outlook 안에서만 동작합니다.'; $('conn').textContent = ''; return; }
+  showItem(); checkConn();
+  try { Office.context.mailbox.addHandlerAsync(Office.EventType.ItemChanged, () => showItem()); } catch(e){}
+});
 </script></body></html>
