@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SLB 연결 테스트</title>
+<script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+<style>
+body{font:13px/1.5 "Malgun Gothic",sans-serif;margin:0;padding:12px;color:#1b1f27}
+h1{font-size:15px;margin:0 0 8px}
+.row{display:grid;grid-template-columns:78px 1fr;gap:2px 8px;margin:4px 0}
+.k{color:#6b7684}.ok{color:#17803d;font-weight:700}.ng{color:#c62828;font-weight:700}
+pre{white-space:pre-wrap;word-break:break-word;background:#f4f6f9;border:1px solid #dde2ea;border-radius:6px;padding:8px;max-height:140px;overflow:auto;font:12px/1.5 inherit}
+button{font:inherit;padding:6px 10px;border:1px solid #bcc5d1;border-radius:6px;background:#fff;cursor:pointer;margin:6px 6px 0 0}
+button.pri{background:#2456d6;color:#fff;border-color:#2456d6}
+.box{border-top:1px solid #e3e7ee;margin-top:10px;padding-top:8px}
+</style></head><body>
+<h1>SLB 연결 테스트</h1>
+<div id="st" class="k">Outlook에 연결하는 중…</div>
+<div id="info" hidden>
+  <div class="row"><span class="k">제목</span><span id="subj"></span></div>
+  <div class="row"><span class="k">보낸 사람</span><span id="from"></span></div>
+  <div class="row"><span class="k">받은 날짜</span><span id="date"></span></div>
+  <div class="row"><span class="k">첨부</span><span id="att"></span></div>
+  <div class="row"><span class="k">본문</span><span id="blen"></span></div>
+  <pre id="body"></pre>
+  <div class="box">
+    <b>넘기는 방법 확인</b><br>
+    <button class="pri" id="copy">메일 내용 복사</button>
+    <button id="ping">내 PC 도우미 응답 확인</button>
+    <div id="res" class="k" style="margin-top:6px"></div>
+  </div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+Office.onReady(info => {
+  if(info.host !== Office.HostType.Outlook){ $('st').innerHTML = '<span class="ng">Outlook이 아닌 곳에서 열렸습니다.</span> 이 페이지는 Outlook 안에서만 동작합니다.'; return; }
+  const it = Office.context.mailbox.item;
+  if(!it){ $('st').innerHTML = '<span class="ng">열어 둔 메일이 없습니다.</span> 메일을 하나 선택한 뒤 다시 누르세요.'; return; }
+  $('st').innerHTML = '<span class="ok">Outlook에 연결됐습니다.</span> (Outlook ' + (Office.context.diagnostics ? Office.context.diagnostics.version : '?') + ')';
+  $('info').hidden = false;
+  $('subj').textContent = it.subject || '(제목 없음)';
+  const f = it.from; $('from').textContent = f ? ((f.displayName || '') + ' <' + (f.emailAddress || '') + '>') : '(알 수 없음)';
+  const d = it.dateTimeCreated; $('date').textContent = d ? new Date(d).toLocaleString('ko-KR') : '(알 수 없음)';
+  const at = it.attachments || []; $('att').textContent = at.length ? at.length + '개: ' + at.map(a => a.name).join(', ') : '없음';
+  it.body.getAsync(Office.CoercionType.Text, r => {
+    if(r.status !== Office.AsyncResultStatus.Succeeded){ $('blen').innerHTML = '<span class="ng">본문을 읽지 못했습니다: ' + (r.error && r.error.message || '') + '</span>'; return; }
+    const t = r.value || ''; window.__body = t;
+    $('blen').innerHTML = '<span class="ok">읽음</span> · ' + t.length.toLocaleString() + '자'; $('body').textContent = t.slice(0, 600) + (t.length > 600 ? ' …' : '');
+  });
+});
+$('copy').onclick = async () => {
+  const it = Office.context.mailbox.item, f = it.from || {};
+  const txt = '제목: ' + (it.subject || '') + '\n보낸 사람: ' + (f.displayName || '') + ' <' + (f.emailAddress || '') + '>\n날짜: ' + (it.dateTimeCreated ? new Date(it.dateTimeCreated).toISOString().slice(0, 16).replace('T', ' ') : '') + '\n\n' + (window.__body || '');
+  try { await navigator.clipboard.writeText(txt); $('res').innerHTML = '<span class="ok">복사했습니다.</span> 메모장에 붙여넣어 확인하세요.'; }
+  catch(e){ const ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select(); let ok = false; try { ok = document.execCommand('copy'); } catch(_){} ta.remove(); $('res').innerHTML = ok ? '<span class="ok">복사했습니다.</span> 메모장에 붙여넣어 확인하세요.' : '<span class="ng">복사하지 못했습니다.</span> ' + (e.message || ''); }
+};
+$('ping').onclick = async () => {
+  $('res').textContent = '확인 중…';
+  try { const r = await fetch('http://127.0.0.1:8771/ping', {cache:'no-store'}); $('res').innerHTML = '<span class="ok">도우미가 응답했습니다</span> (코드 ' + r.status + '). 401·403이면 정상입니다(연결 키를 보내지 않아서).'; }
+  catch(e){ $('res').innerHTML = '<span class="ng">응답이 없습니다.</span> 도우미를 켜지 않았거나, Outlook이 이 주소로의 연결을 막았을 수 있습니다. (' + (e.message || e) + ')'; }
+};
+</script></body></html>

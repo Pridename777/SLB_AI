@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0" xmlns:mailappor="http://schemas.microsoft.com/office/mailappversionoverrides/1.0" xsi:type="MailApp">
+  <Id>0bdee447-dce8-46d6-a29b-cdf381dc99fe</Id>
+  <Version>1.0.0.0</Version>
+  <ProviderName>SLB 인사팀</ProviderName>
+  <DefaultLocale>ko-KR</DefaultLocale>
+  <DisplayName DefaultValue="SLB 연결 테스트"/>
+  <Description DefaultValue="열어 둔 메일의 제목·보낸 사람·본문을 읽을 수 있는지 확인하는 테스트용 추가 기능입니다. 메일 내용은 이 PC 밖으로 보내지 않습니다."/>
+  <IconUrl DefaultValue="https://pridename777.github.io/SLB_AI/outlook_test/icon-64.png"/>
+  <HighResolutionIconUrl DefaultValue="https://pridename777.github.io/SLB_AI/outlook_test/icon-128.png"/>
+  <SupportUrl DefaultValue="https://pridename777.github.io/SLB_AI/outlook_test/taskpane.html"/>
+  <Hosts><Host Name="Mailbox"/></Hosts>
+  <Requirements><Sets><Set Name="Mailbox" MinVersion="1.3"/></Sets></Requirements>
+  <FormSettings>
+    <Form xsi:type="ItemRead">
+      <DesktopSettings><SourceLocation DefaultValue="https://pridename777.github.io/SLB_AI/outlook_test/taskpane.html"/><RequestedHeight>450</RequestedHeight></DesktopSettings>
+    </Form>
+  </FormSettings>
+  <Permissions>ReadItem</Permissions>
+  <Rule xsi:type="RuleCollection" Mode="Or"><Rule xsi:type="ItemIs" ItemType="Message" FormType="Read"/></Rule>
+  <DisableEntityHighlighting>true</DisableEntityHighlighting>
+  <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides" xsi:type="VersionOverridesV1_0">
+    <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides/1.1" xsi:type="VersionOverridesV1_1">
+      <Requirements><bt:Sets DefaultMinVersion="1.3"><bt:Set Name="Mailbox"/></bt:Sets></Requirements>
+      <Hosts>
+        <Host xsi:type="MailHost">
+          <DesktopFormFactor>
+            <ExtensionPoint xsi:type="MessageReadCommandSurface">
+              <OfficeTab id="TabDefault">
+                <Group id="slbGroup">
+                  <Label resid="Group.Label"/>
+                  <Control xsi:type="Button" id="slbBtn">
+                    <Label resid="Btn.Label"/>
+                    <Supertip><Title resid="Btn.Label"/><Description resid="Btn.Tip"/></Supertip>
+                    <Icon><bt:Image size="16" resid="Icon16"/><bt:Image size="32" resid="Icon32"/><bt:Image size="80" resid="Icon80"/></Icon>
+                    <Action xsi:type="ShowTaskpane"><SourceLocation resid="Taskpane.Url"/></Action>
+                  </Control>
+                </Group>
+              </OfficeTab>
+            </ExtensionPoint>
+          </DesktopFormFactor>
+        </Host>
+      </Hosts>
+      <Resources>
+        <bt:Images>
+          <bt:Image id="Icon16" DefaultValue="https://pridename777.github.io/SLB_AI/outlook_test/icon-16.png"/>
+          <bt:Image id="Icon32" DefaultValue="https://pridename777.github.io/SLB_AI/outlook_test/icon-32.png"/>
+          <bt:Image id="Icon80" DefaultValue="https://pridename777.github.io/SLB_AI/outlook_test/icon-80.png"/>
+        </bt:Images>
+        <bt:Urls><bt:Url id="Taskpane.Url" DefaultValue="https://pridename777.github.io/SLB_AI/outlook_test/taskpane.html"/></bt:Urls>
+        <bt:ShortStrings>
+          <bt:String id="Group.Label" DefaultValue="SLB 인사팀"/>
+          <bt:String id="Btn.Label" DefaultValue="SLB 연결 테스트"/>
+        </bt:ShortStrings>
+        <bt:LongStrings><bt:String id="Btn.Tip" DefaultValue="열어 둔 메일을 읽을 수 있는지 확인합니다."/></bt:LongStrings>
+      </Resources>
+    </VersionOverrides>
+  </VersionOverrides>
+</OfficeApp>
