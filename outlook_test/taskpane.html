@@ -27,6 +27,12 @@ button.pri{background:#2456d6;color:#fff;border-color:#2456d6}
     <button id="ping">내 PC 도우미 응답 확인</button>
     <div id="res" class="k" style="margin-top:6px"></div>
   </div>
+  <div class="box">
+    <b>첨부·그림 읽기 확인</b><br>
+    <button class="pri" id="atts">첨부·그림 읽어 보기</button>
+    <div id="ares" class="k" style="margin-top:6px"></div>
+    <div id="alist"></div>
+  </div>
 </div>
 <script>
 const $ = id => document.getElementById(id);
@@ -56,5 +62,30 @@ $('ping').onclick = async () => {
   $('res').textContent = '확인 중…';
   try { const r = await fetch('http://127.0.0.1:8771/ping', {cache:'no-store'}); $('res').innerHTML = '<span class="ok">도우미가 응답했습니다</span> (코드 ' + r.status + '). 401·403이면 정상입니다(연결 키를 보내지 않아서).'; }
   catch(e){ $('res').innerHTML = '<span class="ng">응답이 없습니다.</span> 도우미를 켜지 않았거나, Outlook이 이 주소로의 연결을 막았을 수 있습니다. (' + (e.message || e) + ')'; }
+};
+
+$('atts').onclick = async () => {
+  const it = Office.context.mailbox.item, out = $('ares'), list = $('alist'); list.innerHTML = '';
+  if(!Office.context.requirements.isSetSupported('Mailbox', '1.8') || !it.getAttachmentContentAsync){ out.innerHTML = '<span class="ng">이 Outlook은 첨부 내용 읽기(Mailbox 1.8)를 지원하지 않습니다.</span>'; return; }
+  out.textContent = '읽는 중…';
+  // 본문(HTML) 안의 그림 개수
+  const html = await new Promise(res => it.body.getAsync(Office.CoercionType.Html, r => res(r.status === Office.AsyncResultStatus.Succeeded ? r.value : '')));
+  const imgs = (html.match(/<img\b/gi) || []).length, cids = (html.match(/src=["']cid:/gi) || []).length;
+  const at = (it.attachments || []).slice(0, 8); let ok = 0, ng = 0;
+  const lines = [];
+  for(const a of at){
+    const row = document.createElement('div'); row.style.cssText = 'border-top:1px solid #e3e7ee;margin-top:6px;padding-top:6px';
+    const head = (a.isInline ? '[본문 그림] ' : '[첨부] ') + a.name + ' · ' + (a.contentType || '?') + ' · ' + Math.round((a.size || 0) / 1024) + 'KB';
+    if(a.attachmentType !== Office.MailboxEnums.AttachmentType.File){ row.innerHTML = head + '<br><span class="ng">파일이 아닌 첨부(메일·항목)라 읽지 않았습니다.</span>'; ng++; list.appendChild(row); continue; }
+    if((a.size || 0) > 15 * 1024 * 1024){ row.innerHTML = head + '<br><span class="ng">15MB를 넘어 건너뛰었습니다.</span>'; ng++; list.appendChild(row); continue; }
+    const r = await new Promise(res => it.getAttachmentContentAsync(a.id, x => res(x)));
+    if(r.status === Office.AsyncResultStatus.Succeeded && r.value && r.value.content){
+      ok++; const v = r.value, kb = Math.round((v.format === Office.MailboxEnums.AttachmentContentFormat.Base64 ? v.content.length * 0.75 : v.content.length) / 1024);
+      row.innerHTML = head + '<br><span class="ok">내용 읽음</span> (' + v.format + ', 약 ' + kb + 'KB)';
+      if(v.format === Office.MailboxEnums.AttachmentContentFormat.Base64 && /^image\//i.test(a.contentType || '')){ const im = document.createElement('img'); im.src = 'data:' + a.contentType + ';base64,' + v.content; im.style.cssText = 'display:block;max-width:100%;max-height:120px;margin-top:4px;border:1px solid #dde2ea'; row.appendChild(im); }
+    } else { ng++; row.innerHTML = head + '<br><span class="ng">읽지 못했습니다: ' + ((r.error && r.error.message) || '') + '</span>'; }
+    list.appendChild(row);
+  }
+  out.innerHTML = '본문 안 그림 ' + imgs + '개(메일 첨부형 ' + cids + '개) · 첨부 ' + (it.attachments || []).length + '개 중 <span class="ok">읽음 ' + ok + '</span>' + (ng ? ' · <span class="ng">못 읽음 ' + ng + '</span>' : '');
 };
 </script></body></html>
