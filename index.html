@@ -3,13 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#F4F6FA" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#F7F7F8" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#10141C" media="(prefers-color-scheme: dark)">
 <meta name="robots" content="noindex,nofollow">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="업무 현황">
 <meta name="color-scheme" content="light dark">
-<style>html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
+<style>html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}.pjb{display:inline-block;font-size:11px;font-weight:700;color:#fff;background:#3182f6;border-radius:5px;padding:1px 6px;margin-right:6px;vertical-align:1px}.pjl{font-size:12px;color:#6b7684;margin:2px 0 0;border-left:3px solid #3182f6;padding-left:6px}
+</style>
 <title>인사팀 업무 현황</title>
 <style>
 /* 레이아웃: 아이폰=아래 탭바 / 아이패드 세로=위 고정 탭 / 아이패드 가로=왼쪽 메뉴 + 목록 + 상세 */
@@ -34,6 +35,11 @@ body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:15px
 header{padding-block:16px 4px}
 .hd{display:flex;align-items:center;gap:10px}
 h1{font-size:22px;line-height:1.25;margin:0;flex:1;min-width:0;letter-spacing:-.01em}
+/* v1.45 아이폰: 머리글을 한 줄로 줄이고, 요약 칸은 '급한 일'에서만 보여 목록이 먼저 보이게 합니다 */
+@media (max-width:699px){h1{font-size:19px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.hd{gap:6px}.iconbtn{min-height:36px;padding:0 10px;font-size:12.5px;gap:4px}.iconbtn .ic{width:14px;height:14px}.sum{margin-top:10px}.sum button{min-height:54px;padding:8px 10px}.sum b{font-size:21px}main{gap:14px}.row{padding:12px 12px 12px 16px}}
+@media (max-width:699px){#openf .lb{display:none}#openf{padding:0 11px}}
+@media (max-width:359px){.iconbtn .lb{display:none}.iconbtn{padding:0 10px}}
+.sec.e0 h2{margin:0}.sec.e0 h2 em{color:var(--sub)}
 .stamp{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;margin-top:2px;font-size:12.5px;color:var(--sub)}
 button,input{font:inherit;color:inherit}
 button{cursor:pointer}
@@ -202,13 +208,40 @@ input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events
 }
 @media (prefers-reduced-motion:reduce){ .chev,details.mem summary::after{transition:none} }
 a.fo{color:var(--accent,#1f5fbf);text-decoration:underline;word-break:break-all}a.fob{display:inline-block;text-decoration:none;border:1px solid var(--line);border-radius:10px;padding:7px 12px;font-size:14px}.lnk{background:none;border:0;padding:0;color:var(--accent,#1f5fbf);text-decoration:underline;font:inherit;cursor:pointer}
-.rwb{display:inline-block;font-size:11px;font-weight:700;border-radius:999px;padding:1px 7px;margin-right:5px;background:#fff3d6;color:#8a5a00;vertical-align:1px}.wl .det{padding:4px 14px 12px}.wl .det h3{font-size:13px;margin:10px 0 4px}.wl .det ul{margin:0;padding-left:18px;font-size:13px;line-height:1.55}.wl .u{color:#8b95a1;font-size:12px;margin-right:4px}.wlx{padding:4px 14px 12px}.wlx h3{font-size:13px;margin:10px 0 4px}.wlx ul{margin:0;padding-left:18px;font-size:13px;line-height:1.55}.wlx p{font-size:13px;line-height:1.55;margin:6px 0}.wlx .u{color:#8b95a1;font-size:12px}.fpath{font-size:13px;word-break:break-all;margin:2px 0 6px;color:#333d4b}.fl{margin:0 0 4px;padding-left:18px;font-size:12.5px;color:#4e5968;word-break:break-all}.vw{position:fixed;inset:0;z-index:50;background:var(--bg,#fff);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0)}.vh{display:flex;gap:10px;align-items:center;padding:10px 16px;border-bottom:1px solid rgba(0,0,0,.08)}.vh b{flex:1;font-size:14px;word-break:break-all}.vb{flex:1;overflow:auto;padding:12px 16px 40px;-webkit-overflow-scrolling:touch}.vb pre{white-space:pre-wrap;word-break:break-word;font:13px/1.6 -apple-system,'Noto Sans KR',sans-serif;margin:0}.md{font-size:14px;line-height:1.65}.md h2,.md h3,.md h4,.md h5{margin:14px 0 4px;line-height:1.35}.md h2{font-size:18px}.md h3{font-size:16px}.md h4,.md h5{font-size:14px}.md p{margin:3px 0}.md ul{margin:4px 0;padding-left:20px}.md blockquote{margin:6px 0;padding:2px 10px;border-left:3px solid #c9d1dc;color:#4e5968}.md code{background:#eef0f3;border-radius:4px;padding:0 4px;font-size:12.5px}.md .tr{font-size:12.5px;padding:3px 0;border-bottom:1px solid rgba(0,0,0,.06);word-break:break-word}</style>
+.rwb{display:inline-block;font-size:11px;font-weight:700;border-radius:999px;padding:1px 7px;margin-right:5px;background:#fff3d6;color:#8a5a00;vertical-align:1px}.wl .det{padding:4px 14px 12px}.wl .det h3{font-size:13px;margin:10px 0 4px}.wl .det ul{margin:0;padding-left:18px;font-size:13px;line-height:1.55}.wl .u{color:#8b95a1;font-size:12px;margin-right:4px}.wlx{padding:4px 14px 12px}.wlx h3{font-size:13px;margin:10px 0 4px}.wlx ul{margin:0;padding-left:18px;font-size:13px;line-height:1.55}.wlx p{font-size:13px;line-height:1.55;margin:6px 0}.wlx .u{color:#8b95a1;font-size:12px}.fpath{font-size:13px;word-break:break-all;margin:2px 0 6px;color:#333d4b}.fl{margin:0 0 4px;padding-left:18px;font-size:12.5px;color:#4e5968;word-break:break-all}.vw{position:fixed;inset:0;z-index:50;background:var(--bg,#fff);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0)}.vh{display:flex;gap:10px;align-items:center;padding:10px 16px;border-bottom:1px solid rgba(0,0,0,.08)}.vh b{flex:1;font-size:14px;word-break:break-all}.vb{flex:1;overflow:auto;padding:12px 16px 40px;-webkit-overflow-scrolling:touch}.vb pre{white-space:pre-wrap;word-break:break-word;font:13px/1.6 -apple-system,'Noto Sans KR',sans-serif;margin:0}.md{font-size:14px;line-height:1.65}.md h2,.md h3,.md h4,.md h5{margin:14px 0 4px;line-height:1.35}.md h2{font-size:18px}.md h3{font-size:16px}.md h4,.md h5{font-size:14px}.md p{margin:3px 0}.md ul{margin:4px 0;padding-left:20px}.md blockquote{margin:6px 0;padding:2px 10px;border-left:3px solid #c9d1dc;color:#4e5968}.md code{background:#eef0f3;border-radius:4px;padding:0 4px;font-size:12.5px}.md .tr{font-size:12.5px;padding:3px 0;border-bottom:1px solid rgba(0,0,0,.06);word-break:break-word}
+/* v1.52 화면 디자인 (노트북 앱과 같은 규칙) — [추정] = 문서에 값이 없어 정한 값. 글꼴은 그대로 */
+:root{
+  --bg:oklch(0.972 0.002 286); --surface:oklch(1 0 0); --fg:oklch(0.259 0.010 273 / 0.88); --sub:oklch(0.298 0.010 273 / 0.61);
+  --line:oklch(0.521 0.018 273 / 0.08); --bar:oklch(1 0 0);
+  --accent:oklch(0.563 0.241 261); --accent-weak:oklch(0.954 0.022 250);
+  --late:oklch(0.546 0.220 27); --late-weak:oklch(0.662 0.225 26 / 0.08);
+  --warn:oklch(0.55 0.13 61); --warn-weak:oklch(0.760 0.176 61 / 0.08);
+  --ok:oklch(0.52 0.16 146); --ok-weak:oklch(0.700 0.213 146 / 0.08);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:oklch(0.148 0.004 277); --surface:oklch(0.166 0.005 271); --fg:oklch(1 0 0 / 0.88); --sub:oklch(1 0 0 / 0.61);
+  --line:oklch(1 0 0 / 0.08); --bar:oklch(0.166 0.005 271);
+  --accent:oklch(0.633 0.198 259); --accent-weak:oklch(0.149 0.069 257);
+  --late:oklch(0.700 0.191 23); --late-weak:oklch(0.700 0.191 23 / 0.08);
+  --warn:oklch(0.802 0.157 69); --warn-weak:oklch(0.802 0.157 69 / 0.08);
+  --ok:oklch(0.761 0.214 148); --ok-weak:oklch(0.761 0.214 148 / 0.08); } }
+:root[data-theme="dark"]{
+  --bg:oklch(0.148 0.004 277); --surface:oklch(0.166 0.005 271); --fg:oklch(1 0 0 / 0.88); --sub:oklch(1 0 0 / 0.61);
+  --line:oklch(1 0 0 / 0.08); --bar:oklch(0.166 0.005 271);
+  --accent:oklch(0.633 0.198 259); --accent-weak:oklch(0.149 0.069 257);
+  --late:oklch(0.700 0.191 23); --late-weak:oklch(0.700 0.191 23 / 0.08);
+  --warn:oklch(0.802 0.157 69); --warn-weak:oklch(0.802 0.157 69 / 0.08);
+  --ok:oklch(0.761 0.214 148); --ok-weak:oklch(0.761 0.214 148 / 0.08); }
+.tabs{-webkit-backdrop-filter:none;backdrop-filter:none}
+.tabs button[aria-selected="true"]{box-shadow:0 1px 2px oklch(0.155 0 0 / 0.06),0 1px 3px oklch(0 0 0 / 0.05)}
+h1,h2{letter-spacing:-.012em}
+</style>
 </head>
 <body>
 
 <div class="wrap">
   <header>
-    <div class="hd"><h1>인사팀 업무 현황</h1><button class="iconbtn" id="openf" hidden><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>파일 열기</button><button class="iconbtn" id="reload" hidden><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>새 파일</button></div>
+    <div class="hd"><h1>인사팀 업무 현황</h1><button class="iconbtn" id="openf" hidden title="노트북이 보관한 자료 파일을 열어 봅니다" aria-label="자료 파일 보기"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg><span class="lb">파일 보기</span></button><button class="iconbtn" id="reload" hidden title="노트북에서 새로 저장한 모바일_현황.json을 다시 불러옵니다" aria-label="현황 파일 다시 불러오기"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg><span class="lb">다시 불러오기</span></button></div>
     <div class="stamp" id="stamp" hidden></div>
     <div id="top" hidden><div class="sum" id="sum"></div><input class="search" id="gq" type="search" placeholder="전체 검색 (업무·기록·계약·회의록·노무 자문)" aria-label="전체 검색" style="margin-top:10px"></div>
   </header>
@@ -346,7 +379,7 @@ a.fo{color:var(--accent,#1f5fbf);text-decoration:underline;word-break:break-all}
     var brief = (c.req ? '<div class="brief"><i>내용</i>' + esc(clip(c.req, 70)) + '</div>' : '') + (lastProg(c) && c.stage !== 'done' ? '<div class="brief"><i>진행</i>' + esc(clip(lastProg(c), 80)) + '</div>' : '') + (c.done && c.done.sum ? '<div class="brief"><i>결과</i>' + esc(clip(c.done.sum, 80)) + '</div>' : '');
     var tap = hasDet(c) || c.hidden;
     var dl = (c.due && c.stage !== 'done') ? dleft(c.due) : null, urg = dl == null ? '' : dl < 0 ? ' lt' : dl <= 3 ? ' sn' : '';
-    return '<div class="row' + (tap ? ' tap' : '') + urg + '" data-id="' + esc(c.id) + '"><div class="body"><div class="t">' + (c.rwn ? '<span class="rwb">재작업 ' + c.rwn + '</span>' : '') + (c.boss ? '<span class="bs" title="' + esc(D.bossName || '경영관리본부장') + ' 지시">★</span>' : '') + esc(c.title) + '</div><div class="mline"><div class="m">' + who + esc(c.cat) + ' · ' + esc(stName(c)) + (c.no ? ' · ' + esc(c.no) : '') + '</div>' + dueChip(c) + '</div>' + brief + (c.next && c.stage !== 'done' ? '<div class="n"><i>다음</i>' + esc(c.next) + '</div>' : '') +
+    return '<div class="row' + (tap ? ' tap' : '') + urg + '" data-id="' + esc(c.id) + '"><div class="body"><div class="t">' + (c.rwn ? '<span class="rwb">재작업 ' + c.rwn + '</span>' : '') + (c.boss ? '<span class="bs" title="' + esc(D.bossName || '경영관리본부장') + ' 지시">★</span>' : '') + (c.kids ? '<span class="pjb">프로젝트 ' + c.kids[0] + '/' + c.kids[1] + '</span>' : '') + esc(c.pj ? String(c.title).replace(/^\[[^\]]*\]\s*/, '') : c.title) + '</div>' + (c.pj ? '<div class="pjl">↳ 프로젝트: ' + esc(c.pj.t) + '</div>' : '') + '<div class="mline"><div class="m">' + who + esc(c.cat) + ' · ' + esc(stName(c)) + (c.no ? ' · ' + esc(c.no) : '') + '</div>' + dueChip(c) + '</div>' + brief + (c.next && c.stage !== 'done' ? '<div class="n"><i>다음</i>' + esc(c.next) + '</div>' : '') +
       (tap ? '<div class="det">' + (c.hidden ? '<p>급여·평가 업무라서 제목만 보입니다. 노트북 프로그램 설정에서 바꿀 수 있습니다.</p>' : detail(c)) + '</div>' : '') + '</div>' + (tap ? CHEV : '') + '</div>';
   }
   function recRow(r){
@@ -474,7 +507,7 @@ a.fo{color:var(--accent,#1f5fbf);text-decoration:underline;word-break:break-all}
       ((W.goals || []).length ? '<h3>목표</h3><ul>' + li(W.goals) + '</ul>' : '') + ((W.rules || []).length ? '<h3>현재 지침</h3><ul>' + li(W.rules) + '</ul>' : '') +
       ((W.dec || []).length ? '<h3>결정 사항 (최근)</h3><ul>' + W.dec.map(function(d){ return '<li><span class="u">' + esc((d.at || '').slice(5).replace('-', '/')) + '</span>' + esc(d.t) + (d.card ? ' <span class="u">· ' + esc(d.card) + '</span>' : '') + ((d.notify || []).length ? '<br><span class="u">알릴 사람: ' + esc(d.notify.join(', ')) + '</span>' : '') + '</li>'; }).join('') + '</ul>' : '') + '</div></details>';
   }
-  function sec(title, arr){ return '<section class="sec"><h2>' + esc(title) + ' <em>' + arr.length + '</em></h2><div class="list">' + (arr.length ? arr.map(function(c){ return row(c); }).join('') : '<div class="empty">해당 업무가 없습니다.</div>') + '</div></section>'; }
+  function sec(title, arr){ if(!arr.length) return '<section class="sec e0"><h2>' + esc(title) + ' <em>없음</em></h2></section>'; return '<section class="sec"><h2>' + esc(title) + ' <em>' + arr.length + '</em></h2><div class="list">' + arr.map(function(c){ return row(c); }).join('') + '</div></section>'; }
 
   function stampHTML(){
     var at = String(D.at || ''), txt = at ? (+at.slice(5, 7)) + '월 ' + (+at.slice(8, 10)) + '일 ' + at.slice(11, 16) : '';
@@ -517,7 +550,7 @@ a.fo{color:var(--accent,#1f5fbf);text-decoration:underline;word-break:break-all}
     }
     var cards = D.cards.slice(), open = cards.filter(function(c){ return c.stage !== 'done'; });
     var late = open.filter(function(c){ return c.due && dleft(c.due) < 0; }), soon = open.filter(function(c){ var n = c.due ? dleft(c.due) : null; return n != null && n >= 0 && n <= 3; });
-    stamp.hidden = false; stamp.innerHTML = stampHTML(); top.hidden = false; $('tabs').hidden = false; $('reload').hidden = false; $('openf').hidden = false; document.body.classList.remove('nodata');
+    stamp.hidden = false; stamp.innerHTML = stampHTML(); top.hidden = false; $('sum').hidden = !(tab === 'urgent' || gq.trim() || (window.matchMedia && window.matchMedia('(min-width:700px)').matches)); $('gq').hidden = tab === 'all' && !gq.trim(); $('tabs').hidden = false; $('reload').hidden = false; $('openf').hidden = false; document.body.classList.remove('nodata');
     $('sum').innerHTML = '<button data-go="urgent" class="' + (late.length ? 'hot' : '') + '"><b>' + late.length + '</b><span>마감 지남</span></button><button data-go="urgent" class="' + (soon.length ? 'amb' : '') + '"><b>' + soon.length + '</b><span>3일 내 마감</span></button><button data-go="all"><b>' + open.length + '</b><span>진행 중</span></button>';
     $('tb-urgent').setAttribute('data-n', String(late.length + soon.length));
     ['urgent','cal','team','all','rec','adv'].forEach(function(t){ $('tb-' + t).setAttribute('aria-selected', String(tab === t)); });
