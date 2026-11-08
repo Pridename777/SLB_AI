@@ -89,7 +89,8 @@ main{display:flex;flex-direction:column;gap:18px;padding-block:12px}
 .det p,#pane p{margin:0;white-space:pre-wrap}
 .det ul,#pane ul{margin:0;padding-left:18px}
 .det li,#pane li{margin:2px 0}
-.det li.dn,#pane li.dn{color:var(--sub);text-decoration:line-through}
+.det li.dn,#pane li.dn{color:var(--sub)}.det li.dn .tt,#pane li.dn .tt{text-decoration:line-through}
+.tdm{display:block;font-size:12px;color:var(--sub);text-decoration:none;margin-top:1px}.tdm.late{color:var(--late);font-weight:700}li.dn .tdm{text-decoration:none}.ago{font-weight:700;color:var(--ok)}.ago.old{color:var(--late)}
 .det .u,#pane .u{color:var(--sub);font-variant-numeric:tabular-nums;margin-right:6px}
 .due{flex:none;font-size:12px;font-weight:700;border-radius:999px;padding:2px 9px;background:var(--accent-weak);color:var(--accent);white-space:nowrap;font-variant-numeric:tabular-nums}
 .due.late{background:var(--late-weak);color:var(--late)} .due.soon{background:var(--warn-weak);color:var(--warn)} .due.done{background:var(--ok-weak);color:var(--ok)} .due.none{background:var(--line);color:var(--sub)}
@@ -361,7 +362,7 @@ h1,h2{letter-spacing:-.012em}
       return h || '<p>내용이 없습니다.</p>';
     }
     h += part('요청자', c.requester) + part('요청 내용', c.req) + part('진행 상황', c.prog);
-    if(c.todo && c.todo.length) h += '<h3>할 일</h3><ul>' + c.todo.map(function(x){ return '<li' + (x.d ? ' class="dn"' : '') + '>' + esc(x.t) + '</li>'; }).join('') + '</ul>';
+    if(c.todo && c.todo.length) h += '<h3>할 일</h3><ul>' + c.todo.map(function(x){ return '<li' + (x.d ? ' class="dn"' : '') + '><span class="tt">' + esc(x.t) + '</span>' + tdMeta(x) + '</li>'; }).join('') + '</ul>';
     h += part('다음 할 일', c.nextAll);
     if(c.ups && c.ups.length) h += '<h3>진행 기록</h3><ul>' + c.ups.slice().reverse().map(function(u){ return '<li><span class="u">' + esc((u.at || '').slice(5).replace('-', '/')) + '</span>' + esc(u.t) + '</li>'; }).join('') + '</ul>';
     if(c.nts && c.nts.length) h += '<h3>첨언</h3><ul>' + c.nts.slice().reverse().map(function(u){ return '<li><span class="u">' + esc((u.at || '').slice(5).replace('-', '/')) + '</span>' + esc(u.t) + '</li>'; }).join('') + '</ul>';
@@ -509,9 +510,21 @@ h1,h2{letter-spacing:-.012em}
   }
   function sec(title, arr){ if(!arr.length) return '<section class="sec e0"><h2>' + esc(title) + ' <em>없음</em></h2></section>'; return '<section class="sec"><h2>' + esc(title) + ' <em>' + arr.length + '</em></h2><div class="list">' + arr.map(function(c){ return row(c); }).join('') + '</div></section>'; }
 
+  function md2(ds){ var p = String(ds || '').split('-'); return p.length < 3 ? '' : (+p[1]) + '/' + (+p[2]); }
+  function tdMeta(x){
+    var e = x.e || '', o = x.o || '', bits = [];
+    if(e) bits.push('예정 ' + md2(e));
+    if(x.d && o){ var pe = e.split('-'), po = o.split('-'), g = e ? Math.round((new Date(+po[0], +po[1] - 1, +po[2]) - new Date(+pe[0], +pe[1] - 1, +pe[2])) / 86400000) : null;
+      bits.push('완료 ' + md2(o) + (g == null ? '' : g > 0 ? ' · ' + g + '일 늦음' : g < 0 ? ' · ' + (-g) + '일 일찍' : ' · 제때')); }
+    else if(!x.d && e){ var n = dleft(e); if(n != null && n < 0) bits.push((-n) + '일 지남'); else if(n === 0) bits.push('오늘'); }
+    return bits.length ? '<span class="tdm' + (!x.d && e && dleft(e) < 0 ? ' late' : '') + '">' + esc(bits.join(' · ')) + '</span>' : '';
+  }
   function stampHTML(){
     var at = String(D.at || ''), txt = at ? (+at.slice(5, 7)) + '월 ' + (+at.slice(8, 10)) + '일 ' + at.slice(11, 16) : '';
-    return (sample ? '<span class="sample">예시 데이터</span>' : '') + '<span>노트북에서 저장한 시각 ' + esc(txt) + '</span>';
+    var ago = '', ms0 = at ? (Date.now() - new Date(at.replace(' ', 'T')).getTime()) : NaN;
+    if(!isNaN(ms0) && ms0 >= 0){ var mn = Math.floor(ms0 / 60000); ago = mn < 2 ? '방금' : mn < 60 ? mn + '분 전' : mn < 1440 ? Math.floor(mn / 60) + '시간 전' : Math.floor(mn / 1440) + '일 전'; }
+    var meta = [D.root ? '폴더 ' + D.root : '', D.ver ? '쟈비스 v' + D.ver : ''].filter(Boolean).join(' · ');
+    return (sample ? '<span class="sample">예시 데이터</span>' : '') + '<span>노트북에서 저장한 시각 ' + esc(txt) + (ago ? ' (<b class="ago' + (ms0 >= 86400000 ? ' old' : '') + '">' + ago + '</b>)' : '') + '</span>' + (meta && !sample ? '<span>' + esc(meta) + '</span>' : '');
   }
   function staleHTML(){
     var at = String(D.at || ''); if(!at || sample) return '';
