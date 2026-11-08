@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0" xmlns:mailappor="http://schemas.microsoft.com/office/mailappversionoverrides/1.0" xsi:type="MailApp">
   <Id>0bdee447-dce8-46d6-a29b-cdf381dc99fe</Id>
-  <Version>1.1.0.0</Version>
+  <Version>1.2.0.0</Version>
   <ProviderName>SLB 인사팀</ProviderName>
   <DefaultLocale>ko-KR</DefaultLocale>
   <DisplayName DefaultValue="쟈비스로 보내기"/>
@@ -25,15 +25,22 @@
       <Hosts>
         <Host xsi:type="MailHost">
           <DesktopFormFactor>
+            <FunctionFile resid="Commands.Url"/>
             <ExtensionPoint xsi:type="MessageReadCommandSurface">
               <OfficeTab id="TabDefault">
                 <Group id="slbGroup">
                   <Label resid="Group.Label"/>
+                  <Control xsi:type="Button" id="slbQuick">
+                    <Label resid="Quick.Label"/>
+                    <Supertip><Title resid="Quick.Label"/><Description resid="Quick.Tip"/></Supertip>
+                    <Icon><bt:Image size="16" resid="Icon16"/><bt:Image size="32" resid="Icon32"/><bt:Image size="80" resid="Icon80"/></Icon>
+                    <Action xsi:type="ExecuteFunction"><FunctionName>sendNow</FunctionName></Action>
+                  </Control>
                   <Control xsi:type="Button" id="slbBtn">
                     <Label resid="Btn.Label"/>
                     <Supertip><Title resid="Btn.Label"/><Description resid="Btn.Tip"/></Supertip>
                     <Icon><bt:Image size="16" resid="Icon16"/><bt:Image size="32" resid="Icon32"/><bt:Image size="80" resid="Icon80"/></Icon>
-                    <Action xsi:type="ShowTaskpane"><SourceLocation resid="Taskpane.Url"/><SupportsPinning>true</SupportsPinning></Action>
+                    <Action xsi:type="ShowTaskpane"><SourceLocation resid="Taskpane.Url"/><SupportsPinning>true</SupportsPinning><SupportsMultiSelect>true</SupportsMultiSelect></Action>
                   </Control>
                 </Group>
               </OfficeTab>
@@ -47,12 +54,13 @@
           <bt:Image id="Icon32" DefaultValue="https://pridename777.github.io/SLB_AI/outlook_test/icon-32.png"/>
           <bt:Image id="Icon80" DefaultValue="https://pridename777.github.io/SLB_AI/outlook_test/icon-80.png"/>
         </bt:Images>
-        <bt:Urls><bt:Url id="Taskpane.Url" DefaultValue="https://pridename777.github.io/SLB_AI/outlook_test/taskpane.html"/></bt:Urls>
+        <bt:Urls><bt:Url id="Taskpane.Url" DefaultValue="https://pridename777.github.io/SLB_AI/outlook_test/taskpane.html"/><bt:Url id="Commands.Url" DefaultValue="https://pridename777.github.io/SLB_AI/outlook_test/commands.html"/></bt:Urls>
         <bt:ShortStrings>
           <bt:String id="Group.Label" DefaultValue="SLB 인사팀"/>
           <bt:String id="Btn.Label" DefaultValue="쟈비스로 보내기"/>
+          <bt:String id="Quick.Label" DefaultValue="바로 보내기"/>
         </bt:ShortStrings>
-        <bt:LongStrings><bt:String id="Btn.Tip" DefaultValue="선택한 메일을 담아 쟈비스로 보냅니다. 창을 고정(핀)해 두면 메일을 바꿔 가며 담을 수 있습니다."/></bt:LongStrings>
+        <bt:LongStrings><bt:String id="Btn.Tip" DefaultValue="창을 열어 메일을 담고 한마디를 남겨 보냅니다. 창을 고정(핀)해 두면 메일을 바꿔 가며 담을 수 있고, 여러 통을 한꺼번에 담을 수도 있습니다."/><bt:String id="Quick.Tip" DefaultValue="창을 열지 않고 선택한 메일 한 통을 바로 쟈비스로 보냅니다."/></bt:LongStrings>
       </Resources>
     </VersionOverrides>
   </VersionOverrides>

@@ -21,7 +21,7 @@ textarea{min-height:52px;resize:vertical}
 #st{margin-bottom:6px}
 small{color:#6b7684}
 </style></head><body>
-<h1>쟈비스로 보내기</h1>
+<h1>쟈비스로 보내기 <small>v1.5</small></h1>
 <div id="conn" class="k">도우미 연결 확인 중…</div>
 
 <div id="keyBox" class="box" hidden>
@@ -47,6 +47,13 @@ small{color:#6b7684}
   </div>
 </div>
 
+<div id="multi" class="box" hidden>
+  <h2>선택한 메일 여러 통 <span id="selN"></span></h2>
+  <small>메일을 Ctrl 또는 Shift로 여러 통 고른 뒤 누르세요. 한 번에 30통까지 담을 수 있습니다.</small>
+  <div><button class="pri" id="addSel">선택한 메일 모두 담기</button><button id="sendSel">선택한 메일 모두 바로 보내기</button></div>
+  <div id="mres" class="k" style="margin-top:6px"></div>
+</div>
+
 <div class="box">
   <h2>담은 메일 <span id="bkN"></span></h2>
   <small>관련된 메일을 하나씩 선택해 "담기"를 누른 뒤 한 번에 보내세요. 이 창이 닫혀도 담은 메일은 PC 도우미에 남아 있습니다.</small>
@@ -62,7 +69,7 @@ const BR = 'http://127.0.0.1:8771', $ = id => document.getElementById(id);
 const lsG = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : v; } catch(e){ return d; } };
 const lsS = (k, v) => { try { if(v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch(e){} };
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c]));
-let busy = false, bridgeOk = false;
+let busy = false, bridgeOk = false, selCount = 0;
 
 async function br(method, path, body){
   const h = {'x-bridge-key':lsG('slbBridgeKey', '')}; if(body) h['content-type'] = 'application/json';
@@ -132,6 +139,7 @@ async function loadBasket(){
 function syncBtns(){
   const has = !!(window.Office && Office.context && Office.context.mailbox && Office.context.mailbox.item);
   $('add').disabled = busy || !bridgeOk || !has; $('sendOne').disabled = busy || !bridgeOk || !has; $('send').disabled = busy || !bridgeOk || !(+$('send').dataset.n > 0);
+  $('addSel').disabled = busy || !bridgeOk || selCount < 1; $('sendSel').disabled = busy || !bridgeOk || selCount < 1;
 }
 async function addCurrent(){
   const it = Office.context.mailbox.item; if(!it) return null;
@@ -159,9 +167,49 @@ $('copy').onclick = async () => {
   catch(e){ const ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select(); let ok = false; try { ok = document.execCommand('copy'); } catch(_){} ta.remove(); $('res').innerHTML = ok ? '<span class="ok">복사했습니다.</span>' : '<span class="ng">복사하지 못했습니다.</span>'; }
 };
 
+/* ---------- v1.5 여러 통 선택: 선택한 메일을 하나씩 불러(loadItemByIdAsync) 담습니다 ---------- */
+const MAXMAIL = 30;
+const multiOk = () => { try { return !!(Office.context.mailbox.getSelectedItemsAsync && Office.context.mailbox.loadItemByIdAsync && Office.context.requirements.isSetSupported('Mailbox', '1.15')); } catch(e){ return false; } };
+const getSel = () => new Promise(res => { try { Office.context.mailbox.getSelectedItemsAsync(r => res(r.status === Office.AsyncResultStatus.Succeeded ? (r.value || []) : [])); } catch(e){ res([]); } });
+const loadById = id => new Promise((res, rej) => Office.context.mailbox.loadItemByIdAsync(id, r => r.status === Office.AsyncResultStatus.Succeeded ? res(r.value) : rej(new Error((r.error && r.error.message) || '메일을 불러오지 못했습니다.'))));
+const unloadIt = li => new Promise(res => { try { li.unloadAsync(() => res()); } catch(e){ res(); } });
+async function addSelected(sendAfter){
+  const sel = (await getSel()).filter(x => String(x.itemType).toLowerCase() === 'message');
+  if(!sel.length) throw new Error('선택한 메일이 없습니다.');
+  if(sel.length > MAXMAIL) throw new Error(sel.length + '통을 골랐습니다. 한 번에 ' + MAXMAIL + '통까지만 담을 수 있으니 나누어 선택해 주세요.');
+  let ok = 0, dup = 0; const fail = [], notes = [];
+  for(let i = 0; i < sel.length; i++){
+    $('mres').textContent = (i + 1) + '/' + sel.length + '통 읽는 중… ' + (sel[i].subject || '');
+    let li = null;
+    try {
+      li = await loadById(sel[i].itemId);
+      const m = await buildEml(li);
+      if(m.eml.length > 44 * 1024 * 1024) throw new Error('메일이 너무 큽니다(첨부 포함 약 30MB 이하)');
+      const b = await br('POST', '/inbox/add', {draft:lsG('slbDraft', ''), mail:Object.assign({eml:m.eml}, m.meta)});
+      lsS('slbDraft', b.id); renderBasket(b);
+      if(b.dup) dup++; else ok++;
+      m.notes.forEach(n => notes.push(n));
+    } catch(e){ fail.push((sel[i].subject || '(제목 없음)') + ' — ' + (e.message || e)); }
+    finally { if(li) await unloadIt(li); }
+  }
+  if(sendAfter && (ok + dup) > 0) await sendDraft();
+  $('mres').innerHTML = '<span class="' + (fail.length ? 'warn' : 'ok') + '">' + ok + '통 ' + (sendAfter ? '보냈습니다' : '담았습니다') + '</span>' + (dup ? ' · 이미 담은 메일 ' + dup + '통' : '') +
+    (notes.length ? '<br><span class="warn">뺀 것: ' + esc(notes.join(', ')) + '</span>' : '') + (fail.length ? '<br><span class="ng">못 담은 메일 ' + fail.length + '통<br>' + fail.map(esc).join('<br>') + '</span>' : '');
+}
+$('addSel').onclick = run(() => addSelected(false).catch(e => { $('mres').innerHTML = '<span class="ng">' + esc(e.message || e) + '</span>'; }));
+$('sendSel').onclick = run(() => addSelected(true).catch(e => { $('mres').innerHTML = '<span class="ng">' + esc(e.message || e) + '</span>'; }));
+async function refreshSel(){
+  if(!multiOk()){ selCount = 0; $('multi').hidden = true; syncBtns(); return; }
+  const sel = (await getSel()).filter(x => String(x.itemType).toLowerCase() === 'message');
+  selCount = sel.length; $('selN').textContent = sel.length > 1 ? sel.length + '통 선택됨' : '';
+  $('multi').hidden = sel.length < 2;
+  if(sel.length > 1){ $('st').innerHTML = '<span class="warn">메일 ' + sel.length + '통이 선택되어 있습니다.</span> 아래 "선택한 메일 모두 담기"를 누르세요.'; $('info').hidden = true; }
+  syncBtns();
+}
+
 function showItem(){
   const it = Office.context.mailbox.item;
-  if(!it){ $('st').innerHTML = '<span class="warn">메일을 하나 선택하세요.</span>'; $('info').hidden = true; syncBtns(); return; }
+  if(!it){ if(!(multiOk() && selCount > 1)) $('st').innerHTML = '<span class="warn">메일을 하나 선택하세요.</span>'; $('info').hidden = true; syncBtns(); return; }
   $('st').innerHTML = ''; $('info').hidden = false; $('res').textContent = '';
   $('subj').textContent = it.subject || '(제목 없음)';
   const f = it.from; $('from').textContent = f ? ((f.displayName || '') + ' <' + (f.emailAddress || '') + '>') : '(알 수 없음)';
@@ -172,7 +220,8 @@ function showItem(){
 }
 Office.onReady(info => {
   if(info.host !== Office.HostType.Outlook){ $('st').innerHTML = '<span class="ng">Outlook이 아닌 곳에서 열렸습니다.</span> 이 페이지는 Outlook 안에서만 동작합니다.'; $('conn').textContent = ''; return; }
-  showItem(); checkConn();
-  try { Office.context.mailbox.addHandlerAsync(Office.EventType.ItemChanged, () => showItem()); } catch(e){}
+  showItem(); checkConn(); refreshSel();
+  try { Office.context.mailbox.addHandlerAsync(Office.EventType.ItemChanged, () => { showItem(); refreshSel(); }); } catch(e){}
+  try { if(Office.EventType.SelectedItemsChanged) Office.context.mailbox.addHandlerAsync(Office.EventType.SelectedItemsChanged, () => { showItem(); refreshSel(); }); } catch(e){}
 });
 </script></body></html>

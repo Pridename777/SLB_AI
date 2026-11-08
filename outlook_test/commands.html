@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>쟈비스로 바로 보내기</title>
+<script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+</head><body>
+<script>
+/* 리본의 "바로 보내기" 버튼: 창을 열지 않고, 선택한 메일 한 통을 PC 도우미를 거쳐 쟈비스 "받은 메일"로 보냅니다. */
+const BR = 'http://127.0.0.1:8771';
+const lsG = (k, d) => { try { const v = localStorage.getItem(k); return v == null ? d : v; } catch(e){ return d; } };
+let running = false;
+
+async function br(method, path, body){
+  const h = {'x-bridge-key':lsG('slbBridgeKey', '')}; if(body) h['content-type'] = 'application/json';
+  let r;
+  try { r = await fetch(BR + path, {method, headers:h, body:body ? JSON.stringify(body) : undefined, cache:'no-store'}); }
+  catch(e){ throw new Error('PC 도우미에 연결하지 못했습니다. "SLB도우미_실행"이 켜져 있는지 확인하세요.'); }
+  const d = await r.json().catch(() => ({}));
+  if(r.status === 401) throw new Error('연결 키가 맞지 않습니다. "쟈비스로 보내기" 창에서 키를 다시 넣어 주세요.');
+  if(r.status === 403) throw new Error('도우미가 이 추가 기능을 받지 않습니다. 도우미를 새 버전(v1.4)으로 바꿔 주세요.');
+  if(!r.ok) throw new Error(d.error || ('도우미 오류 ' + r.status));
+  return d;
+}
+function b64u(s){ const by = new TextEncoder().encode(String(s || '')); let bin = ''; for(let i = 0; i < by.length; i += 0x8000) bin += String.fromCharCode.apply(null, by.subarray(i, i + 0x8000)); return btoa(bin); }
+const word = s => '=?UTF-8?B?' + b64u(s) + '?=';
+const wrap = b => b.replace(/\s+/g, '').replace(/.{1,76}/g, '$&\r\n');
+const addr = e => e ? (e.displayName ? word(e.displayName) + ' ' : '') + '<' + (e.emailAddress || '') + '>' : '';
+const getBody = (it, t) => new Promise(res => it.body.getAsync(t, r => res(r.status === Office.AsyncResultStatus.Succeeded ? (r.value || '') : '')));
+const getAtt = (it, id) => new Promise(res => it.getAttachmentContentAsync(id, r => res(r)));
+async function buildEml(it){
+  const text = await getBody(it, Office.CoercionType.Text), B = '----slb' + Math.random().toString(36).slice(2), notes = [], names = new Set(), atts = [];
+  const canRead = !!it.getAttachmentContentAsync && Office.context.requirements.isSetSupported('Mailbox', '1.8');
+  let parts = '';
+  for(const a of (it.attachments || [])){
+    if(a.isInline && (a.size || 0) < 4096) continue;
+    if(a.attachmentType !== Office.MailboxEnums.AttachmentType.File){ notes.push(a.name + '(메일·항목 첨부라 뺌)'); continue; }
+    if((a.size || 0) > 15 * 1024 * 1024){ notes.push(a.name + '(15MB 초과로 뺌)'); continue; }
+    if(!canRead){ notes.push(a.name + '(이 Outlook은 첨부 읽기를 지원하지 않음)'); continue; }
+    const r = await getAtt(it, a.id);
+    if(r.status !== Office.AsyncResultStatus.Succeeded || !r.value || r.value.format !== Office.MailboxEnums.AttachmentContentFormat.Base64){ notes.push(a.name + '(읽지 못함)'); continue; }
+    let nm = a.name || 'file', k = 1; const dot = nm.lastIndexOf('.'); while(names.has(nm)){ k++; nm = dot > 0 ? a.name.slice(0, dot) + '-' + k + a.name.slice(dot) : a.name + '-' + k; } names.add(nm);
+    atts.push(nm);
+    parts += '--' + B + '\r\nContent-Type: ' + (a.contentType || 'application/octet-stream') + '; name="' + word(nm) + '"\r\nContent-Transfer-Encoding: base64\r\nContent-Disposition: attachment; filename="' + word(nm) + '"\r\n\r\n' + wrap(r.value.content) + '\r\n';
+  }
+  const d = it.dateTimeCreated ? new Date(it.dateTimeCreated) : new Date();
+  const eml = 'MIME-Version: 1.0\r\nFrom: ' + addr(it.from) + '\r\nTo: ' + (it.to || []).map(addr).join(', ') + '\r\n' + ((it.cc || []).length ? 'Cc: ' + it.cc.map(addr).join(', ') + '\r\n' : '') +
+    'Subject: ' + word(it.subject || '(제목 없음)') + '\r\nDate: ' + d.toUTCString() + '\r\nContent-Type: multipart/mixed; boundary="' + B + '"\r\n\r\n' +
+    '--' + B + '\r\nContent-Type: text/plain; charset="utf-8"\r\nContent-Transfer-Encoding: base64\r\n\r\n' + wrap(b64u(text)) + '\r\n' + parts + '--' + B + '--\r\n';
+  return {eml, atts, notes, meta:{key:it.itemId || (it.subject + '|' + d.toISOString()), subject:it.subject || '(제목 없음)', from:it.from ? (it.from.displayName || it.from.emailAddress) : '', date:d.toLocaleString('ko-KR'), atts}};
+}
+
+/* 메일 위쪽 알림 줄 (받는 사람은 보지 못합니다) */
+function note(item, type, msg){
+  return new Promise(res => {
+    try {
+      const d = type === 'info' ? {type:Office.MailboxEnums.ItemNotificationMessageType.InformationalMessage, message:msg.slice(0, 150), icon:'Icon16', persistent:false}
+        : type === 'busy' ? {type:Office.MailboxEnums.ItemNotificationMessageType.ProgressIndicator, message:msg.slice(0, 150)}
+        : {type:Office.MailboxEnums.ItemNotificationMessageType.ErrorMessage, message:msg.slice(0, 150)};
+      item.notificationMessages.replaceAsync('slbSend', d, () => res());
+    } catch(e){ res(); }
+  });
+}
+
+async function sendNow(event){
+  if(running){ event.completed(); return; }
+  running = true;
+  const item = Office.context.mailbox.item;
+  try {
+    if(!item){ throw new Error('메일을 한 통만 선택하고 눌러 주세요. 여러 통은 "쟈비스로 보내기" 창에서 보냅니다.'); }
+    if(!lsG('slbBridgeKey', '')) throw new Error('연결 키가 아직 없습니다. "쟈비스로 보내기" 창을 열어 키를 한 번 넣어 주세요.');
+    await note(item, 'busy', '쟈비스로 보내는 중…');
+    const m = await buildEml(item);
+    if(m.eml.length > 44 * 1024 * 1024) throw new Error('메일이 너무 큽니다(첨부 포함 약 30MB 이하만 보낼 수 있습니다).');
+    const b = await br('POST', '/inbox/add', {draft:'', mail:Object.assign({eml:m.eml}, m.meta)});
+    await br('POST', '/inbox/send', {draft:b.id, note:''});
+    await note(item, 'info', '쟈비스로 보냈습니다.' + (m.atts.length ? ' (첨부 ' + m.atts.length + '개)' : '') + (m.notes.length ? ' 뺀 것: ' + m.notes.join(', ') : ''));
+  } catch(e){
+    if(item) await note(item, 'err', String((e && e.message) || e));
+  }
+  running = false;
+  event.completed();
+}
+Office.onReady(() => { Office.actions.associate('sendNow', sendNow); });
+</script></body></html>
