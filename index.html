@@ -103,6 +103,11 @@ main{display:flex;flex-direction:column;gap:18px;padding-block:12px}
 .staleb>div{flex:1;min-width:0}
 .staleb b{display:block;font-size:14.5px}
 .staleb span{display:block;font-size:12.5px;margin-top:1px}
+mark{background:var(--warn-weak);color:inherit;border-radius:3px;padding:0 1px;box-shadow:inset 0 -2px 0 var(--warn)}
+.rgc{display:inline-block;font-style:normal;font-size:11px;font-weight:700;padding:1px 7px;border-radius:999px;margin-left:6px;vertical-align:1px;background:var(--accent-weak);color:var(--accent);white-space:nowrap}
+.rgc.w{background:var(--warn-weak);color:var(--warn)}.rgc.ok{background:var(--ok-weak);color:var(--ok)}.rgc.l{background:var(--late-weak);color:var(--late)}
+.rgx{white-space:pre-wrap;font-size:14.5px;line-height:1.65;overflow-wrap:anywhere;margin:0}
+.rgch{font-size:12px;color:var(--sub);margin:0 0 6px}
 details.mem{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
 details.mem + details.mem{margin-top:8px}
 details.mem summary{list-style:none;display:flex;align-items:center;gap:10px;padding:12px 14px;min-height:56px;cursor:pointer}
@@ -244,7 +249,7 @@ h1,h2{letter-spacing:-.012em}
   <header>
     <div class="hd"><h1>인사팀 업무 현황</h1><button class="iconbtn" id="openf" hidden title="노트북이 보관한 자료 파일을 열어 봅니다" aria-label="자료 파일 보기"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg><span class="lb">파일 보기</span></button><button class="iconbtn" id="reload" hidden title="노트북에서 새로 저장한 모바일_현황.json을 다시 불러옵니다" aria-label="현황 파일 다시 불러오기"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg><span class="lb">다시 불러오기</span></button></div>
     <div class="stamp" id="stamp" hidden></div>
-    <div id="top" hidden><div class="sum" id="sum"></div><input class="search" id="gq" type="search" placeholder="전체 검색 (업무·기록·계약·회의록·노무 자문)" aria-label="전체 검색" style="margin-top:10px"></div>
+    <div id="top" hidden><div class="sum" id="sum"></div><input class="search" id="gq" type="search" placeholder="전체 검색 (업무·기록·계약·회의록·자문·규정)" aria-label="전체 검색" style="margin-top:10px"></div>
   </header>
   <nav class="tabs" id="tabs" role="tablist" aria-label="보기" hidden><button role="tab" id="tb-urgent" aria-selected="true" data-tab="urgent"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg><span>급한 일</span></button><button role="tab" id="tb-cal" aria-selected="false" data-tab="cal"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v3"/><path d="M16 2v3"/><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M8 13h.01"/><path d="M12 13h.01"/><path d="M16 13h.01"/><path d="M8 17h.01"/><path d="M12 17h.01"/><path d="M16 17h.01"/></svg><span>일정</span></button><button role="tab" id="tb-team" aria-selected="false" data-tab="team"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M16 3.128a4 4 0 0 1 0 7.744"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><circle cx="9" cy="7" r="4"/></svg><span>팀원별</span></button><button role="tab" id="tb-all" aria-selected="false" data-tab="all"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h.01"/><path d="M3 12h.01"/><path d="M3 19h.01"/><path d="M8 5h13"/><path d="M8 12h13"/><path d="M8 19h13"/></svg><span>전체</span></button><button role="tab" id="tb-rec" aria-selected="false" data-tab="rec"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg><span>기록</span></button><button role="tab" id="tb-adv" aria-selected="false" data-tab="adv"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18"/><path d="m19 8 3 8a5 5 0 0 1-6 0zV7"/><path d="M3 7h1a17 17 0 0 0 8-2 17 17 0 0 0 8 2h1"/><path d="m5 8 3 8a5 5 0 0 1-6 0zV7"/><path d="M7 21h10"/></svg><span>노무</span></button></nav>
   <main id="main"></main>
@@ -270,7 +275,7 @@ h1,h2{letter-spacing:-.012em}
   function sampleData(){
     var t = today(), f = function(n){ var d = new Date(t); d.setDate(d.getDate() + n); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); };
     var now = new Date(); var at = f(0) + ' ' + ('0' + now.getHours()).slice(-2) + ':' + ('0' + now.getMinutes()).slice(-2) + ':00';
-    return {app:'모바일 현황', at:at, bossName:'경영관리본부장',
+    return {regs:[{n:'예시 출장여비 규정', no:'EX-00', rev:f(-30), eff:f(-20), st:'conv', sec:'일반문서', src:'예시.pdf', arts:[{l:'제1조(목적)', c:'제1장 총칙', x:'이 규정은 출장에 드는 비용의 지급 기준을 정함을 목적으로 한다. (예시 글입니다)'},{l:'제2조(숙박비)', c:'제1장 총칙', x:'숙박비는 1박 기준으로 지급하며 영수증을 첨부한다. (예시 글입니다)'},{l:'제3조(일비)', c:'제2장 지급 기준', x:'구분: 국내 / 금액: 예시 30,000원\n구분: 해외 / 금액: 예시 50 USD'}]}], app:'모바일 현황', at:at, bossName:'경영관리본부장',
       members:[{name:'팀원 가',title:'책임',memo:'교육, 조직문화'},{name:'팀원 나',title:'책임',memo:'평가'},{name:'팀원 다',title:'선임',memo:'급여, 평가'},{name:'팀원 라',title:'선임',memo:'급여, 교육'},{name:'팀원 마',title:'주임',memo:'채용'}],
       cards:[
         {id:'s1',no:'HR-0412',title:'리더십 과정 운영 안내문',cat:'교육·육성',stage:'approval',dr:1,owner:'팀원 가',collab:['팀원 라'],due:f(-2),next:'교육 일정 확정 후 안내문 발송',req:'리더 대상 교육 과정의 운영 일정과 참석 안내문을 만들어 주세요.',prog:'안내문 초안 작성 완료. 일정 확정을 기다리는 중.',todo:[{t:'일정 확정',d:false},{t:'안내문 발송',d:false}],ups:[{at:f(-5),t:'안내문 초안 작성'},{at:f(-3),t:'팀장 검토 요청'}]},
@@ -488,7 +493,7 @@ h1,h2{letter-spacing:-.012em}
   }
   function byDue(a, b){ var x = a.due || '9999', y = b.due || '9999'; return x < y ? -1 : x > y ? 1 : 0; }
   var recK = 'rec';
-  function recChips(){ var h = '<div class="chips" id="recchips">' + [['rec','끝난 일'],['mt','회의록'],['ct','계약']].map(function(x){ return '<button data-rk="' + x[0] + '" aria-pressed="' + String(recK === x[0]) + '">' + x[1] + '</button>'; }).join('') + '</div>'; setTimeout(function(){ var b = document.querySelectorAll('[data-rk]'); for(var i = 0; i < b.length; i++) b[i].onclick = function(){ recK = this.getAttribute('data-rk'); render(); }; }, 0); return h; }
+  function recChips(){ var h = '<div class="chips" id="recchips">' + [['rec','끝난 일'],['mt','회의록'],['ct','계약'],['rg','규정']].map(function(x){ return '<button data-rk="' + x[0] + '" aria-pressed="' + String(recK === x[0]) + '">' + x[1] + '</button>'; }).join('') + '</div>'; setTimeout(function(){ var b = document.querySelectorAll('[data-rk]'); for(var i = 0; i < b.length; i++) b[i].onclick = function(){ recK = this.getAttribute('data-rk'); render(); }; }, 0); return h; }
   function mtItem(m){ return '<details class="mem"><summary><div class="nm"><b>' + esc(m.title) + '</b><span>' + esc(m.date) + '</span></div><div class="cnt">할 일 ' + (m.act || []).length + '</div></summary><div class="det wlx">' +
       (m.ov ? '<p>' + esc(m.ov) + '</p>' : '') + ((m.dec || []).length ? '<h3>결정</h3><ul>' + m.dec.map(function(t){ return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' : '') +
       ((m.act || []).length ? '<h3>할 일</h3><ul>' + m.act.map(function(x){ return '<li>' + esc(x.w) + (x.o || x.d ? ' <span class="u">· ' + esc([x.o, x.d ? x.d.slice(5).replace('-', '/') : ''].filter(Boolean).join(' · ')) + '</span>' : '') + '</li>'; }).join('') + '</ul>' : '') + '</div></details>'; }
@@ -532,6 +537,47 @@ h1,h2{letter-spacing:-.012em}
     if(!(n >= 1)) return '';
     return '<div class="staleb" role="status"><div><b>' + n + '일 전 현황입니다</b><span>노트북에서 저장한 뒤 새 파일을 불러오세요.</span></div><button class="btn sm" id="reload2">불러오기</button></div>';
   }
+  /* v1.77 규정 조회: 노트북 프로그램이 변환해 둔 사내 규정 조문을 낱말로 찾습니다. AI를 쓰지 않고, 저장된 글자를 그대로 보여 줍니다. */
+  var rq = '';
+  var RG_ST = {verified:'검수 완료', conv:'검수 전', changed:'원본 바뀜'};
+  function rgToks(s){ return String(s || '').toLowerCase().split(/\s+/).filter(Boolean); }
+  function hl(txt, toks){
+    var t = String(txt == null ? '' : txt); if(!toks || !toks.length) return esc(t);
+    var re = new RegExp('(' + toks.map(function(x){ return x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }).join('|') + ')', 'gi');
+    return t.split(re).map(function(p, i){ return i % 2 ? '<mark>' + esc(p) + '</mark>' : esc(p); }).join('');
+  }
+  function rgChips(r){
+    return (r.st ? '<em class="rgc ' + (r.st === 'verified' ? 'ok' : 'w') + '">' + esc(RG_ST[r.st] || r.st) + '</em>' : '') + (r.sec ? '<em class="rgc' + (r.sec === '일반문서' ? '' : ' l') + '">' + esc(r.sec) + '</em>' : '');
+  }
+  function rgMeta(r){ return [r.no, r.eff ? '시행 ' + r.eff : ''].filter(Boolean).join(' · '); }
+  function regSearch(toks){
+    var out = []; if(!toks.length) return out;
+    (D.regs || []).forEach(function(r){ (r.arts || []).forEach(function(a){
+      var head = (r.n + ' ' + a.l + ' ' + (a.c || '')).toLowerCase(), hay = head + ' ' + String(a.x || '').toLowerCase();
+      if(toks.every(function(t){ return hay.indexOf(t) >= 0; })) out.push({r:r, a:a, k:toks.filter(function(t){ return a.l.toLowerCase().indexOf(t) >= 0; }).length}); }); });
+    return out.sort(function(x, y){ return y.k - x.k; });
+  }
+  function regArt(r, a, toks, open, withReg){
+    return '<details class="mem rga"' + (open ? ' open' : '') + '><summary><div class="nm"><b>' + hl(a.l, toks) + '</b><span>' + esc((withReg ? r.n : '') + (withReg && a.c ? ' · ' : '') + (a.c || '')) + '</span></div>' + (withReg ? '<div class="cnt">' + rgChips(r) + '</div>' : '') + '</summary>' +
+      '<div class="det wlx">' + (withReg ? '<p class="rgch">' + esc(rgMeta(r)) + '</p>' : '') + '<p class="rgx">' + hl(a.x, toks) + '</p></div></details>';
+  }
+  function regNote(){
+    var regs = D.regs || [], pre = regs.filter(function(r){ return r.st !== 'verified'; }).length;
+    return '<p class="note">' + (pre ? '"검수 전" 규정은 PDF에서 뽑은 글자를 아직 사람이 확인하지 않았습니다. 중요한 판단은 원본 PDF로 확인하세요. ' : '') + '보안등급은 규정 머리말에 적힌 값입니다. 노트북에서 규정을 바꾼 뒤에는 현황 파일을 다시 불러오세요.</p>';
+  }
+  function regHTML(){
+    var regs = D.regs || [];
+    if(!regs.length) return recChips() + '<div class="empty">규정이 없습니다. 노트북 프로그램의 "사내 규정"에서 변환한 뒤 업무를 저장하면 나타납니다. 설정의 "사내 규정 조문도 넣기"가 켜져 있어야 합니다.</div>';
+    var toks = rgToks(rq), h = recChips() + '<input class="search" id="rq" type="search" placeholder="규정 검색 (예: 연차, 숙박비)" value="' + esc(rq) + '" aria-label="규정 검색">';
+    if(toks.length){
+      var hits = regSearch(toks);
+      return h + '<p class="note" style="margin:0 0 8px">조문 ' + hits.length + '건' + (hits.length > 40 ? ' (앞 40건만 보입니다. 낱말을 더 넣어 좁혀 보세요)' : '') + '</p>' +
+        (hits.length ? '<section class="sec"><div class="list">' + hits.slice(0, 40).map(function(x){ return regArt(x.r, x.a, toks, hits.length <= 5, true); }).join('') + '</div></section>' : '<div class="empty">찾는 조문이 없습니다. 낱말을 줄이거나 바꿔 보세요.</div>') + regNote();
+    }
+    return h + '<section class="sec"><div class="list">' + regs.map(function(r){
+      return '<details class="mem"><summary><div class="nm"><b>' + esc(r.n) + '</b><span>' + esc(rgMeta(r)) + rgChips(r) + '</span></div><div class="cnt">조문 ' + (r.arts || []).length + '</div></summary><div class="det wlx">' +
+        (r.arts || []).map(function(a){ return regArt(r, a, [], false, false); }).join('') + '</div></details>'; }).join('') + '</div></section>' + regNote();
+  }
   /* v1.40 첫 화면 통합 검색: 업무·끝난 일·기록·계약·회의록·노무 자문·업무 일지를 한 번에 찾습니다 */
   var gq = '';
   function gsHTML(){
@@ -543,10 +589,11 @@ h1,h2{letter-spacing:-.012em}
     var ms = (D.mt || []).filter(function(m){ return hit([m.title, m.date, m.ov, (m.dec || []).join(' '), (m.act || []).map(function(x){ return x.w + ' ' + (x.o || ''); }).join(' ')].join(' ')); });
     var as = Array.isArray(D.adv) ? D.adv.filter(function(x){ return hit(advHay(x)); }) : [];
     var W = D.wl || {}, wl = [].concat((W.goals || []).map(function(t){ return '목표 · ' + t; }), (W.rules || []).map(function(t){ return '지침 · ' + t; }), (W.dec || []).map(function(d){ return '결정 ' + (d.at || '').slice(5).replace('-', '/') + ' · ' + d.t + (d.card ? ' (' + d.card + ')' : ''); })).filter(hit);
-    var n = op.length + dn.length + rs.length + ks.length + ms.length + as.length + wl.length;
+    var rg = regSearch(toks);
+    var n = op.length + dn.length + rs.length + ks.length + ms.length + as.length + wl.length + rg.length;
     var g = function(t, arr, f){ return arr.length ? '<section class="sec"><h2>' + esc(t) + ' <em>' + arr.length + '</em></h2><div class="list">' + arr.slice(0, 40).map(f).join('') + '</div></section>' : ''; };
     return '<p class="note" style="margin:0 0 8px">"' + esc(gq) + '" 전체 검색 ' + n + '건 <button class="lnk" id="gqx">검색 지우기</button></p>' +
-      (n ? g('진행 중 업무', op, function(c){ return row(c); }) + g('끝난 업무', dn, function(c){ return row(c); }) + g('기록', rs, recRow) + g('계약', ks, ctItem) + g('회의록', ms, mtItem) + g('노무 자문', as, advRow) +
+      (n ? g('진행 중 업무', op, function(c){ return row(c); }) + g('끝난 업무', dn, function(c){ return row(c); }) + g('기록', rs, recRow) + g('계약', ks, ctItem) + g('회의록', ms, mtItem) + g('노무 자문', as, advRow) + g('사내 규정', rg, function(x){ return regArt(x.r, x.a, toks, rg.length <= 5, true); }) +
         (wl.length ? '<section class="sec"><h2>업무 일지 <em>' + wl.length + '</em></h2><div class="list"><div class="row"><div class="body"><ul style="margin:0;padding-left:18px">' + wl.map(function(t){ return '<li>' + esc(t) + '</li>'; }).join('') + '</ul></div></div></div></section>' : '')
         : '<div class="empty">찾는 내용이 없습니다. 단어를 줄이거나 바꿔 보세요. (급여·평가 업무는 제목만, 회의록은 노트북 설정에서 켠 경우에만 들어 있습니다)</div>');
   }
@@ -592,7 +639,7 @@ h1,h2{letter-spacing:-.012em}
     } else if(tab === 'adv'){
       html = advHTML();
     } else if(tab === 'rec' && recK !== 'rec'){
-      html = recChips() + (recK === 'mt' ? mtHTML() : ctHTML());
+      html = recK === 'rg' ? regHTML() : recChips() + (recK === 'mt' ? mtHTML() : ctHTML());
     } else if(tab === 'rec'){
       var recs = (D.records || []).filter(function(r){ return !q || (r.title + ' ' + (r.requester || '') + ' ' + (r.handler || '') + ' ' + (r.outcome || '') + ' ' + (r.notes || '') + ' ' + (r.kw || '') + ' ' + r.cat).toLowerCase().indexOf(q.toLowerCase()) >= 0; });
       html = recChips() + '<input class="search" id="q" type="search" placeholder="기록 검색" value="' + esc(q) + '" aria-label="검색">' +
@@ -611,6 +658,7 @@ h1,h2{letter-spacing:-.012em}
     var of = $('openf'); if(of) of.onclick = openFile;
     var rl2 = $('reload2'); if(rl2) rl2.onclick = pick;
     var qi = $('q'); if(qi) qi.oninput = function(){ q = qi.value; var pos = qi.selectionStart; render(); var n = $('q'); n.focus(); try { n.setSelectionRange(pos, pos); } catch(e){} };
+    var ri = $('rq'); if(ri) ri.oninput = function(){ rq = ri.value; var pos = ri.selectionStart; render(); var n = $('rq'); n.focus(); try { n.setSelectionRange(pos, pos); } catch(e){} };
     var ai = $('aq'); if(ai) ai.oninput = function(){ aq = ai.value; var pos = ai.selectionStart; render(); var n = $('aq'); n.focus(); try { n.setSelectionRange(pos, pos); } catch(e){} };
     var arch = $('arch'); if(arch) arch.onclick = function(e){ var b = e.target.closest('button'); if(!b) return; advR = b.getAttribute('data-ar'); advF = ''; render(); };
     var ach = $('achips'); if(ach) ach.onclick = function(e){ var b = e.target.closest('button'); if(!b) return; advF = b.getAttribute('data-at'); render(); };
