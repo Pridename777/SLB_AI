@@ -40,6 +40,7 @@ h1{font-size:22px;line-height:1.25;margin:0;flex:1;min-width:0;letter-spacing:-.
 @media (max-width:699px){#openf .lb{display:none}#openf{padding:0 11px}}
 @media (max-width:359px){.iconbtn .lb{display:none}.iconbtn{padding:0 10px}}
 .sec.e0 h2{margin:0}.sec.e0 h2 em{color:var(--sub)}
+.kv{display:flex;justify-content:space-between;gap:14px;padding:6px 0;font-size:14.5px;border-top:1px solid var(--line)}.kv:first-child{border-top:0}.kv span{color:var(--sub)}.kv b{font-weight:600;text-align:right}
 .stamp{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;margin-top:2px;font-size:12.5px;color:var(--sub)}
 button,input{font:inherit;color:inherit}
 button{cursor:pointer}
@@ -493,7 +494,7 @@ h1,h2{letter-spacing:-.012em}
   }
   function byDue(a, b){ var x = a.due || '9999', y = b.due || '9999'; return x < y ? -1 : x > y ? 1 : 0; }
   var recK = 'rec';
-  function recChips(){ var h = '<div class="chips" id="recchips">' + [['rec','끝난 일'],['mt','회의록'],['ct','계약'],['rg','규정']].map(function(x){ return '<button data-rk="' + x[0] + '" aria-pressed="' + String(recK === x[0]) + '">' + x[1] + '</button>'; }).join('') + '</div>'; setTimeout(function(){ var b = document.querySelectorAll('[data-rk]'); for(var i = 0; i < b.length; i++) b[i].onclick = function(){ recK = this.getAttribute('data-rk'); render(); }; }, 0); return h; }
+  function recChips(){ var h = '<div class="chips" id="recchips">' + [['rec','끝난 일'],['mt','회의록'],['ct','계약'],['rg','규정']].concat(D.roster ? [['ro','직원']] : []).map(function(x){ return '<button data-rk="' + x[0] + '" aria-pressed="' + String(recK === x[0]) + '">' + x[1] + '</button>'; }).join('') + '</div>'; setTimeout(function(){ var b = document.querySelectorAll('[data-rk]'); for(var i = 0; i < b.length; i++) b[i].onclick = function(){ recK = this.getAttribute('data-rk'); render(); }; }, 0); return h; }
   function mtItem(m){ return '<details class="mem"><summary><div class="nm"><b>' + esc(m.title) + '</b><span>' + esc(m.date) + '</span></div><div class="cnt">할 일 ' + (m.act || []).length + '</div></summary><div class="det wlx">' +
       (m.ov ? '<p>' + esc(m.ov) + '</p>' : '') + ((m.dec || []).length ? '<h3>결정</h3><ul>' + m.dec.map(function(t){ return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' : '') +
       ((m.act || []).length ? '<h3>할 일</h3><ul>' + m.act.map(function(x){ return '<li>' + esc(x.w) + (x.o || x.d ? ' <span class="u">· ' + esc([x.o, x.d ? x.d.slice(5).replace('-', '/') : ''].filter(Boolean).join(' · ')) + '</span>' : '') + '</li>'; }).join('') + '</ul>' : '') + '</div></details>'; }
@@ -578,6 +579,35 @@ h1,h2{letter-spacing:-.012em}
       return '<details class="mem"><summary><div class="nm"><b>' + esc(r.n) + '</b><span>' + esc(rgMeta(r)) + rgChips(r) + '</span></div><div class="cnt">조문 ' + (r.arts || []).length + '</div></summary><div class="det wlx">' +
         (r.arts || []).map(function(a){ return regArt(r, a, [], false, false); }).join('') + '</div></details>'; }).join('') + '</div></section>' + regNote();
   }
+  /* v1.80 직원 명단: 노트북 설정에서 "직원 명단도 넣기"를 켠 경우에만 들어 있습니다. 목록에는 이름·직위·소속만 보이고, 이름을 눌러야 입사일·생년월일이 보입니다. */
+  var oq = '';
+  function roAge(b){ if(!/^\d{4}-\d{2}-\d{2}$/.test(b || '')) return ''; var t = new Date(), y = t.getFullYear() - +b.slice(0, 4); if((t.getMonth() + 1) * 100 + t.getDate() < +b.slice(5, 7) * 100 + +b.slice(8, 10)) y--; return y >= 0 && y < 120 ? ' (만 ' + y + '세)' : ''; }
+  function roHay(p){ return [p.n, p.rk, p.ro, p.dv, p.tm, p.dp, p.ar, p.g, p.st].join(' ').toLowerCase(); }
+  function roItem(p){
+    var org = [p.dv, p.tm, p.dp].filter(function(x, i, a){ return x && a.indexOf(x) === i; }).join(' · ');
+    var kv = function(k, v){ return v ? '<div class="kv"><span>' + k + '</span><b>' + esc(v) + '</b></div>' : ''; };
+    return '<details class="mem"><summary><div class="nm"><b>' + esc(p.n) + '</b><span>' + esc([p.rk, p.ro].filter(Boolean).join(' · ') + (org ? ' · ' + org : '')) + '</span></div><div class="cnt">' + (p.st !== '재직' ? esc(p.st) : '') + '</div></summary><div class="det wlx">' +
+      kv('소속', org) + kv('근무지', p.ar) + kv('사원그룹', p.g) + kv('입사일', p.jn) + kv('생년월일', (p.bd || '') + roAge(p.bd)) + kv('퇴사일', p.lf) + '</div></details>';
+  }
+  function roHTML(){
+    var R = D.roster, h = recChips();
+    if(!R || !(R.rows || []).length) return h + '<div class="empty">직원 명단이 없습니다. 노트북 프로그램 설정의 "직원 명단도 넣기"를 켜고 저장한 뒤 현황 파일을 다시 불러오세요.</div>';
+    var rows = R.rows, act = rows.filter(function(p){ return p.st !== '퇴사'; }), toks = rgToks(oq);
+    var lim = new Date(); lim.setDate(lim.getDate() - 30); var ls = lim.getFullYear() + '-' + ('0' + (lim.getMonth() + 1)).slice(-2) + '-' + ('0' + lim.getDate()).slice(-2);
+    var hit = toks.length ? rows.filter(function(p){ var hy = roHay(p); return toks.every(function(t){ return hy.indexOf(t) >= 0; }); }) : [];
+    var out = h + '<input class="search" id="oq" type="search" placeholder="이름·직위·팀 검색 (예: 책임 품질)" value="' + esc(oq) + '" aria-label="직원 검색">';
+    if(toks.length){
+      return out + '<p class="note" style="margin:0 0 8px">' + hit.length + '명' + (hit.length > 60 ? ' (앞 60명만 보입니다. 낱말을 더 넣어 좁혀 보세요)' : '') + '</p>' +
+        (hit.length ? '<section class="sec"><div class="list">' + hit.slice(0, 60).map(roItem).join('') + '</div></section>' : '<div class="empty">찾는 직원이 없습니다. 낱말을 줄이거나 바꿔 보세요.</div>');
+    }
+    var cnt = {}; act.forEach(function(p){ var k = p.dv || '(본부 없음)'; cnt[k] = (cnt[k] || 0) + 1; });
+    var ins = rows.filter(function(p){ return p.st !== '퇴사' && p.jn && p.jn >= ls; }), outs = rows.filter(function(p){ return p.st === '퇴사' && p.lf && p.lf >= ls; });
+    var leave = act.filter(function(p){ return p.st === '휴직'; }).length;
+    return out + '<section class="sec"><div class="list"><div class="row"><div class="body"><b>재직 ' + (act.length - leave) + '명</b>' + (leave ? ' · 휴직 ' + leave + '명' : '') + '<br><span style="color:var(--sub)">기준일 ' + esc(R.asOf || '-') + '</span></div></div>' +
+      '<details class="mem"><summary><div class="nm"><b>사업본부별 인원</b> <span style="color:var(--sub);font-size:12px">휴직 포함</span></div></summary><div class="det wlx">' + Object.keys(cnt).sort(function(a, b){ return cnt[b] - cnt[a]; }).map(function(k){ return '<div class="kv"><span>' + esc(k) + '</span><b>' + cnt[k] + '명</b></div>'; }).join('') + '</div></details>' +
+      '<details class="mem"><summary><div class="nm"><b>최근 30일 입사·퇴사</b></div><div class="cnt">입사 ' + ins.length + ' · 퇴사 ' + outs.length + '</div></summary><div class="det wlx">' + (ins.length || outs.length ? ins.map(function(p){ return '<div class="kv"><span>입사 ' + esc(p.jn) + '</span><b>' + esc(p.n) + '</b></div>'; }).join('') + outs.map(function(p){ return '<div class="kv"><span>퇴사 ' + esc(p.lf) + '</span><b>' + esc(p.n) + '</b></div>'; }).join('') : '<p class="note">최근 30일 안의 입사·퇴사가 없습니다.</p>') + '</div></details></div></section>' +
+      '<p class="note">이름·직위·팀 낱말로 찾으세요. 이름을 누르면 입사일·생년월일이 보입니다. 개인정보이므로 다른 사람이 화면을 보지 않게 하세요. 사번·연락처·급여는 들어 있지 않습니다.</p>';
+  }
   /* v1.40 첫 화면 통합 검색: 업무·끝난 일·기록·계약·회의록·노무 자문·업무 일지를 한 번에 찾습니다 */
   var gq = '';
   function gsHTML(){
@@ -601,7 +631,7 @@ h1,h2{letter-spacing:-.012em}
      입력 중인 검색칸은 그대로 두고, 그 앞뒤 내용만 바꿉니다. */
   function setMain(h){
     var ae = document.activeElement, main = $('main');
-    if(ae && ae.tagName === 'INPUT' && ae.parentNode === main && /^(q|rq|aq)$/.test(ae.id)){
+    if(ae && ae.tagName === 'INPUT' && ae.parentNode === main && /^(q|rq|aq|oq)$/.test(ae.id)){
       var tmp = document.createElement('div'); tmp.innerHTML = h;
       var nin = tmp.querySelector('#' + ae.id);
       if(nin && nin.parentNode === tmp){
@@ -658,7 +688,7 @@ h1,h2{letter-spacing:-.012em}
     } else if(tab === 'adv'){
       html = advHTML();
     } else if(tab === 'rec' && recK !== 'rec'){
-      html = recK === 'rg' ? regHTML() : recChips() + (recK === 'mt' ? mtHTML() : ctHTML());
+      html = recK === 'ro' ? roHTML() : recK === 'rg' ? regHTML() : recChips() + (recK === 'mt' ? mtHTML() : ctHTML());
     } else if(tab === 'rec'){
       var recs = (D.records || []).filter(function(r){ return !q || (r.title + ' ' + (r.requester || '') + ' ' + (r.handler || '') + ' ' + (r.outcome || '') + ' ' + (r.notes || '') + ' ' + (r.kw || '') + ' ' + r.cat).toLowerCase().indexOf(q.toLowerCase()) >= 0; });
       html = recChips() + '<input class="search" id="q" type="search" placeholder="기록 검색" value="' + esc(q) + '" aria-label="검색">' +
@@ -678,6 +708,7 @@ h1,h2{letter-spacing:-.012em}
     var rl2 = $('reload2'); if(rl2) rl2.onclick = pick;
     var qi = $('q'); if(qi) qi.oninput = function(){ q = qi.value; render(); var n = $('q'); if(n !== qi){ n.focus(); } };
     var ri = $('rq'); if(ri) ri.oninput = function(){ rq = ri.value; render(); var n = $('rq'); if(n !== ri){ n.focus(); } };
+    var oi = $('oq'); if(oi) oi.oninput = function(){ oq = oi.value; render(); var n = $('oq'); if(n !== oi){ n.focus(); } };
     var ai = $('aq'); if(ai) ai.oninput = function(){ aq = ai.value; render(); var n = $('aq'); if(n !== ai){ n.focus(); } };
     var arch = $('arch'); if(arch) arch.onclick = function(e){ var b = e.target.closest('button'); if(!b) return; advR = b.getAttribute('data-ar'); advF = ''; render(); };
     var ach = $('achips'); if(ach) ach.onclick = function(e){ var b = e.target.closest('button'); if(!b) return; advF = b.getAttribute('data-at'); render(); };
