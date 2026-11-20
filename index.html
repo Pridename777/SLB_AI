@@ -597,6 +597,25 @@ h1,h2{letter-spacing:-.012em}
         (wl.length ? '<section class="sec"><h2>업무 일지 <em>' + wl.length + '</em></h2><div class="list"><div class="row"><div class="body"><ul style="margin:0;padding-left:18px">' + wl.map(function(t){ return '<li>' + esc(t) + '</li>'; }).join('') + '</ul></div></div></div></section>' : '')
         : '<div class="empty">찾는 내용이 없습니다. 단어를 줄이거나 바꿔 보세요. (급여·평가 업무는 제목만, 회의록은 노트북 설정에서 켠 경우에만 들어 있습니다)</div>');
   }
+  /* 아이폰 한글 입력: 검색칸에 글자를 칠 때마다 칸을 새로 그리면 한글 조합이 끊겨 자모가 갈라집니다.
+     입력 중인 검색칸은 그대로 두고, 그 앞뒤 내용만 바꿉니다. */
+  function setMain(h){
+    var ae = document.activeElement, main = $('main');
+    if(ae && ae.tagName === 'INPUT' && ae.parentNode === main && /^(q|rq|aq)$/.test(ae.id)){
+      var tmp = document.createElement('div'); tmp.innerHTML = h;
+      var nin = tmp.querySelector('#' + ae.id);
+      if(nin && nin.parentNode === tmp){
+        var kids = [].slice.call(tmp.childNodes), idx = kids.indexOf(nin);
+        while(ae.previousSibling) main.removeChild(ae.previousSibling);
+        while(ae.nextSibling) main.removeChild(ae.nextSibling);
+        kids.slice(0, idx).forEach(function(k){ main.insertBefore(k, ae); });
+        kids.slice(idx + 1).forEach(function(k){ main.appendChild(k); });
+        ae.setAttribute('aria-label', nin.getAttribute('aria-label') || '');
+        return;
+      }
+    }
+    main.innerHTML = h;
+  }
   function render(){
     var main = $('main'), top = $('top'), stamp = $('stamp');
     if(!D){
@@ -653,13 +672,13 @@ h1,h2{letter-spacing:-.012em}
         '<section class="sec"><div class="list" id="alllist">' + (list.length ? list.map(function(c){ return row(c); }).join('') : '<div class="empty">조건에 맞는 업무가 없습니다.</div>') + '</div></section>' +
         '<p class="note">완료한 업무는 최근 30일 분만 들어 있습니다.</p>';
     }
-    main.innerHTML = staleHTML() + html;
+    setMain(staleHTML() + html);
     var rl = $('reload'); if(rl) rl.onclick = pick;
     var of = $('openf'); if(of) of.onclick = openFile;
     var rl2 = $('reload2'); if(rl2) rl2.onclick = pick;
-    var qi = $('q'); if(qi) qi.oninput = function(){ q = qi.value; var pos = qi.selectionStart; render(); var n = $('q'); n.focus(); try { n.setSelectionRange(pos, pos); } catch(e){} };
-    var ri = $('rq'); if(ri) ri.oninput = function(){ rq = ri.value; var pos = ri.selectionStart; render(); var n = $('rq'); n.focus(); try { n.setSelectionRange(pos, pos); } catch(e){} };
-    var ai = $('aq'); if(ai) ai.oninput = function(){ aq = ai.value; var pos = ai.selectionStart; render(); var n = $('aq'); n.focus(); try { n.setSelectionRange(pos, pos); } catch(e){} };
+    var qi = $('q'); if(qi) qi.oninput = function(){ q = qi.value; render(); var n = $('q'); if(n !== qi){ n.focus(); } };
+    var ri = $('rq'); if(ri) ri.oninput = function(){ rq = ri.value; render(); var n = $('rq'); if(n !== ri){ n.focus(); } };
+    var ai = $('aq'); if(ai) ai.oninput = function(){ aq = ai.value; render(); var n = $('aq'); if(n !== ai){ n.focus(); } };
     var arch = $('arch'); if(arch) arch.onclick = function(e){ var b = e.target.closest('button'); if(!b) return; advR = b.getAttribute('data-ar'); advF = ''; render(); };
     var ach = $('achips'); if(ach) ach.onclick = function(e){ var b = e.target.closest('button'); if(!b) return; advF = b.getAttribute('data-at'); render(); };
     var ch = $('chips'); if(ch) ch.onclick = function(e){ var b = e.target.closest('button'); if(!b) return; stageF = b.getAttribute('data-st'); render(); };
