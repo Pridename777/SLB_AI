@@ -40,6 +40,19 @@ h1{font-size:22px;line-height:1.25;margin:0;flex:1;min-width:0;letter-spacing:-.
 @media (max-width:699px){#openf .lb{display:none}#openf{padding:0 11px}}
 @media (max-width:359px){.iconbtn .lb{display:none}.iconbtn{padding:0 10px}}
 .sec.e0 h2{margin:0}.sec.e0 h2 em{color:var(--sub)}
+#ideaSheet{position:fixed;inset:0;z-index:60;background:oklch(0.2 0 0 / 0.45);display:flex;align-items:flex-end;justify-content:center}
+#ideaSheet[hidden]{display:none}
+body.isOpen{overflow:hidden}
+.isPanel{background:var(--surface);width:100%;max-width:640px;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
+.isHd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.isHd h2{margin:0;font-size:18px}
+#isTx{width:100%;box-sizing:border-box;font:inherit;font-size:16px;line-height:1.6;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:inherit;resize:vertical}
+.isPh{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:10px 0}
+.isTh{position:relative;width:72px;height:72px}.isTh img{width:72px;height:72px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
+.isTh button{position:absolute;top:-6px;right:-6px;width:26px;height:26px;border-radius:50%;border:0;background:oklch(0.25 0 0);color:#fff;font-size:15px;line-height:26px;padding:0}
+.isMsg{margin:4px 0 10px;font-size:14px;font-weight:600;color:var(--accent)}
+.isItem{border-top:1px solid var(--line);padding:10px 0;font-size:14px}.isSt{color:var(--sub);font-size:13px;margin-top:2px}.isSt.un{color:var(--late);font-weight:600}.isAct{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.ibn{background:var(--late);color:#fff;border-radius:999px;font-size:11px;min-width:18px;height:18px;line-height:18px;text-align:center;padding:0 5px}
+@media (max-width:380px){ .ibl{display:none} }
 .kv{display:flex;justify-content:space-between;gap:14px;padding:6px 0;font-size:14.5px;border-top:1px solid var(--line)}.kv:first-child{border-top:0}.kv span{color:var(--sub)}.kv b{font-weight:600;text-align:right}
 .stamp{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px;margin-top:2px;font-size:12.5px;color:var(--sub)}
 button,input{font:inherit;color:inherit}
@@ -248,7 +261,7 @@ h1,h2{letter-spacing:-.012em}
 
 <div class="wrap">
   <header>
-    <div class="hd"><h1>인사팀 업무 현황</h1><button class="iconbtn" id="openf" hidden title="노트북이 보관한 자료 파일을 열어 봅니다" aria-label="자료 파일 보기"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg><span class="lb">파일 보기</span></button><button class="iconbtn" id="reload" hidden title="노트북에서 새로 저장한 모바일_현황.json을 다시 불러옵니다" aria-label="현황 파일 다시 불러오기"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg><span class="lb">다시 불러오기</span></button></div>
+    <div class="hd"><h1>인사팀 업무 현황</h1><button class="iconbtn" id="ideaBtn" title="떠오른 아이디어를 적어 구글 드라이브에 저장합니다" aria-label="아이디어 적기"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg><span class="ibl">아이디어</span><span class="ibn" hidden></span></button><button class="iconbtn" id="openf" hidden title="노트북이 보관한 자료 파일을 열어 봅니다" aria-label="자료 파일 보기"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg><span class="lb">파일 보기</span></button><button class="iconbtn" id="reload" hidden title="노트북에서 새로 저장한 모바일_현황.json을 다시 불러옵니다" aria-label="현황 파일 다시 불러오기"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg><span class="lb">다시 불러오기</span></button></div>
     <div class="stamp" id="stamp" hidden></div>
     <div id="top" hidden><div class="sum" id="sum"></div><input class="search" id="gq" type="search" placeholder="전체 검색 (업무·기록·계약·회의록·자문·규정)" aria-label="전체 검색" style="margin-top:10px"></div>
   </header>
@@ -608,6 +621,111 @@ h1,h2{letter-spacing:-.012em}
       '<details class="mem"><summary><div class="nm"><b>최근 30일 입사·퇴사</b></div><div class="cnt">입사 ' + ins.length + ' · 퇴사 ' + outs.length + '</div></summary><div class="det wlx">' + (ins.length || outs.length ? ins.map(function(p){ return '<div class="kv"><span>입사 ' + esc(p.jn) + '</span><b>' + esc(p.n) + '</b></div>'; }).join('') + outs.map(function(p){ return '<div class="kv"><span>퇴사 ' + esc(p.lf) + '</span><b>' + esc(p.n) + '</b></div>'; }).join('') : '<p class="note">최근 30일 안의 입사·퇴사가 없습니다.</p>') + '</div></details></div></section>' +
       '<p class="note">이름·직위·팀 낱말로 찾으세요. 이름을 누르면 입사일·생년월일이 보입니다. 개인정보이므로 다른 사람이 화면을 보지 않게 하세요. 사번·연락처·급여는 들어 있지 않습니다.</p>';
   }
+  /* v1.81 아이디어 적기: 글·사진을 아이디어 파일(.json) 하나로 만들어 아이폰 공유 창으로 넘깁니다.
+     "파일에 저장"(또는 Drive)에서 노트북 쟈비스가 읽는 구글 드라이브 폴더를 고르면 노트북 아이디어함에 들어갑니다.
+     웹페이지는 폴더에 직접 쓸 수 없어서(아이폰 Safari) 공유 창을 거칩니다. 저장하지 못한 아이디어는 이 휴대폰에 남겨 다시 보낼 수 있게 합니다. */
+  var IKEY = 'slb_m_ideas_v1', IDRAFT = 'slb_m_idea_draft', iDraftPh = [], iMsg = '';
+  function iLoad(){ try { var a = JSON.parse(localStorage.getItem(IKEY) || '[]'); return Array.isArray(a) ? a : []; } catch(e){ return []; } }
+  function iSave(a){ try { localStorage.setItem(IKEY, JSON.stringify(a.slice(0, 60))); return true; } catch(e){ return false; } }
+  function iP2(n){ return ('0' + n).slice(-2); }
+  function iAt(d){ d = d || new Date(); return d.getFullYear() + '-' + iP2(d.getMonth() + 1) + '-' + iP2(d.getDate()) + ' ' + iP2(d.getHours()) + ':' + iP2(d.getMinutes()); }
+  function iNewId(){ var d = new Date(); return d.getFullYear() + iP2(d.getMonth() + 1) + iP2(d.getDate()) + '_' + iP2(d.getHours()) + iP2(d.getMinutes()) + iP2(d.getSeconds()) + '_' + Math.random().toString(36).slice(2, 6); }
+  function iResize(file){
+    return new Promise(function(res, rej){
+      var u = URL.createObjectURL(file), img = new Image();
+      img.onload = function(){ try { var M = 1600, w = img.naturalWidth, h = img.naturalHeight, k = Math.min(1, M / Math.max(w, h)), c = document.createElement('canvas'); c.width = Math.round(w * k); c.height = Math.round(h * k); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(u); res(c.toDataURL('image/jpeg', 0.82)); } catch(e){ URL.revokeObjectURL(u); rej(e); } };
+      img.onerror = function(){ URL.revokeObjectURL(u); rej(new Error('사진을 열지 못했습니다')); };
+      img.src = u;
+    });
+  }
+  function iFile(r){
+    var o = {slbIdea:1, id:r.id, at:r.at, text:r.text, dev:'iPhone', photos:(r.photos || []).map(function(p, i){ return {n:p.n || ('사진' + (i + 1) + '.jpg'), d:p.d}; })};
+    return new File([JSON.stringify(o)], '아이디어_' + r.id + '.json', {type:'application/json'});
+  }
+  function iDownload(f){ var a = document.createElement('a'); a.href = URL.createObjectURL(f); a.download = f.name; document.body.appendChild(a); a.click(); setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 4000); return 'download'; }
+  function iSend(r){
+    // 공유 창은 누른 순간에 바로 열어야 해서(아이폰 규칙) 파일을 여기서 곧바로 만듭니다.
+    var f = iFile(r);
+    if(navigator.canShare && navigator.share && navigator.canShare({files:[f]})){
+      return navigator.share({files:[f]}).then(function(){ return 'shared'; }, function(e){ return e && e.name === 'AbortError' ? 'cancel' : iDownload(f); });
+    }
+    return Promise.resolve(iDownload(f));
+  }
+  function iMark(r, how){
+    var a = iLoad(), x = a.find(function(y){ return y.id === r.id; });
+    if(!x){ x = r; a.unshift(x); }
+    if(how === 'shared' || how === 'download'){ x.sent = how; x.sentAt = iAt(); x.pn = (x.photos || []).length || x.pn || 0; x.photos = []; }
+    if(!iSave(a)){ x.photos = []; iSave(a); return false; }
+    return true;
+  }
+  function iStat(x){
+    var L = (D && D.ideas) || [], s = L.find(function(y){ return y.id === x.id; });
+    if(s) return s.st === 'card' ? '노트북: 업무 카드로 만듦' + (s.card ? ' (' + s.card + ')' : '') : s.st === 'keep' ? '노트북: 보관' : '노트북: 받음';
+    if(!x.sent) return '아직 저장 안 됨';
+    return x.sent === 'download' ? '다운로드 폴더에 저장됨 (구글 드라이브 아이디어 폴더로 옮겨야 노트북에서 보입니다)' : '저장함 · 노트북 확인 전';
+  }
+  function iHTML(){
+    var a = iLoad(), uns = a.filter(function(x){ return !x.sent; }), dr = '';
+    try { dr = localStorage.getItem(IDRAFT) || ''; } catch(e){}
+    return '<div class="isPanel" role="dialog" aria-modal="true" aria-labelledby="isT">' +
+      '<div class="isHd"><h2 id="isT">아이디어 적기</h2><button class="btn alt sm" id="isX">닫기</button></div>' +
+      '<textarea id="isTx" rows="6" placeholder="떠오른 생각을 적으세요. 받아쓰기(마이크)도 됩니다." aria-label="아이디어 내용">' + esc(dr) + '</textarea>' +
+      '<div class="isPh" id="isPh">' + iDraftPh.map(function(p, i){ return '<span class="isTh"><img src="' + p.d + '" alt="' + esc(p.n) + '"><button data-rm="' + i + '" aria-label="사진 빼기">×</button></span>'; }).join('') +
+        '<label class="btn alt sm isAdd">사진 추가<input type="file" id="isF" accept="image/*" multiple hidden></label></div>' +
+      (iMsg ? '<p class="isMsg" role="status">' + esc(iMsg) + '</p>' : '') +
+      '<button class="btn" id="isGo" style="width:100%">저장</button>' +
+      '<p class="note" style="margin:8px 0 0">저장을 누르면 공유 창이 뜹니다. <b>파일에 저장</b>(또는 <b>Drive</b>)을 누르고, 노트북 쟈비스 아이디어함에 적힌 <b>구글 드라이브 폴더</b>를 고르세요. 두 번째부터는 보통 마지막 폴더가 먼저 보입니다.</p>' +
+      (a.length ? '<h3 style="margin:18px 0 6px;font-size:15px">내 아이디어' + (uns.length ? ' <span style="color:var(--late)">· 저장 안 된 것 ' + uns.length + '건</span>' : '') + '</h3><div class="isList">' + a.slice(0, 20).map(function(x){
+        return '<div class="isItem"><div><b>' + esc(x.at) + '</b> ' + esc(String(x.text || '(사진만)').slice(0, 60)) + ((x.photos || []).length || x.pn ? ' · 사진 ' + ((x.photos || []).length || x.pn) + '장' : '') + '</div><div class="isSt' + (x.sent ? '' : ' un') + '">' + esc(iStat(x)) + '</div>' +
+          '<div class="isAct">' + (!x.sent && (x.text || (x.photos || []).length) ? '<button class="btn sm" data-re="' + esc(x.id) + '">다시 저장</button>' : '') + '<button class="btn alt sm" data-del="' + esc(x.id) + '">목록에서 빼기</button></div></div>';
+      }).join('') + '</div><p class="note">이 목록은 이 휴대폰에만 있습니다. 목록에서 빼도 이미 저장한 파일은 그대로입니다.</p>' : '') +
+      '</div>';
+  }
+  function ideaOpen(){
+    var sh = $('ideaSheet');
+    if(!sh){ sh = document.createElement('div'); sh.id = 'ideaSheet'; document.body.appendChild(sh); sh.addEventListener('click', function(e){ if(e.target === sh) ideaClose(); }); }
+    sh.hidden = false; document.body.classList.add('isOpen'); ideaDraw(true);
+  }
+  function ideaClose(){ var sh = $('ideaSheet'); if(sh){ sh.hidden = true; } document.body.classList.remove('isOpen'); iMsg = ''; ideaBadgeM(); var b = $('ideaBtn'); if(b) b.focus(); }
+  function ideaDraw(focus){
+    var sh = $('ideaSheet'); if(!sh) return;
+    sh.innerHTML = iHTML(); ideaBadgeM();
+    var tx = $('isTx');
+    tx.oninput = function(){ try { localStorage.setItem(IDRAFT, tx.value); } catch(e){} };   // 다시 그리지 않습니다(한글 조합 유지)
+    $('isX').onclick = ideaClose;
+    $('isF').onchange = function(){
+      var fs = [].slice.call(this.files || []); this.value = '';
+      var left = 6 - iDraftPh.length; if(fs.length > left){ iMsg = '사진은 한 번에 6장까지 넣을 수 있습니다.'; fs = fs.slice(0, Math.max(0, left)); }
+      try { localStorage.setItem(IDRAFT, tx.value); } catch(e){}
+      Promise.all(fs.map(function(f){ return iResize(f).then(function(d){ return {n:f.name || '사진.jpg', d:d}; }, function(){ iMsg = (f.name || '사진') + '을(를) 열지 못했습니다.'; return null; }); }))
+        .then(function(ps){ ps.forEach(function(p){ if(p) iDraftPh.push(p); }); ideaDraw(); });
+    };
+    [].forEach.call(sh.querySelectorAll('[data-rm]'), function(b){ b.onclick = function(){ try { localStorage.setItem(IDRAFT, tx.value); } catch(e){} iDraftPh.splice(+b.getAttribute('data-rm'), 1); ideaDraw(); }; });
+    $('isGo').onclick = function(){
+      var t = tx.value.trim();
+      if(!t && !iDraftPh.length){ iMsg = '글이나 사진을 넣어 주세요.'; ideaDraw(true); return; }
+      var r = {id:iNewId(), at:iAt(), text:t, photos:iDraftPh.slice(), sent:''};
+      iMark(r, '');   // 공유 창을 취소해도 남도록 먼저 보관
+      iSend(r).then(function(how){
+        if(how === 'cancel'){ iMsg = '저장을 취소했습니다. 아래 "내 아이디어"에서 다시 저장할 수 있습니다.'; }
+        else { var ok = iMark(r, how); iMsg = how === 'shared' ? '저장했습니다. 노트북 쟈비스 아이디어함에서 확인하세요.' : '이 휴대폰의 다운로드 폴더에 저장했습니다. 파일 앱에서 구글 드라이브 아이디어 폴더로 옮겨 주세요.'; if(!ok) iMsg += ' (휴대폰 저장 공간이 부족해 목록에는 사진 없이 남겼습니다)'; }
+        iDraftPh = []; try { localStorage.removeItem(IDRAFT); } catch(e){}
+        ideaDraw();
+      });
+    };
+    [].forEach.call(sh.querySelectorAll('[data-re]'), function(b){ b.onclick = function(){
+      var x = iLoad().find(function(y){ return y.id === b.getAttribute('data-re'); }); if(!x) return;
+      iSend(x).then(function(how){ if(how !== 'cancel'){ iMark(x, how); iMsg = how === 'shared' ? '저장했습니다.' : '다운로드 폴더에 저장했습니다. 구글 드라이브 아이디어 폴더로 옮겨 주세요.'; } else iMsg = '저장을 취소했습니다.'; ideaDraw(); });
+    }; });
+    [].forEach.call(sh.querySelectorAll('[data-del]'), function(b){ b.onclick = function(){
+      var a = iLoad(), x = a.find(function(y){ return y.id === b.getAttribute('data-del'); });
+      if(x && !x.sent && !window.confirm('아직 저장하지 않은 아이디어입니다. 목록에서 빼면 사라집니다. 뺄까요?')) return;
+      iSave(a.filter(function(y){ return y !== x; })); ideaDraw();
+    }; });
+    if(focus) setTimeout(function(){ var t = $('isTx'); if(t) t.focus(); }, 50);
+  }
+  function ideaBadgeM(){ var b = $('ideaBtn'); if(!b) return; var n = iLoad().filter(function(x){ return !x.sent; }).length; var s = b.querySelector('.ibn'); if(s){ s.textContent = n ? String(n) : ''; s.hidden = !n; } }
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape' && $('ideaSheet') && !$('ideaSheet').hidden) ideaClose(); });
   /* v1.40 첫 화면 통합 검색: 업무·끝난 일·기록·계약·회의록·노무 자문·업무 일지를 한 번에 찾습니다 */
   var gq = '';
   function gsHTML(){
@@ -745,6 +863,7 @@ h1,h2{letter-spacing:-.012em}
 
   var saved = store(true); if(saved){ try { var o = JSON.parse(saved); if(valid(o)) D = o; } catch(e){} }
   render();
+  var ibt = $('ideaBtn'); if(ibt) ibt.onclick = ideaOpen; ideaBadgeM(); setInterval(ideaBadgeM, 4000);
 })();
 </script>
 
