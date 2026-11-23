@@ -311,7 +311,7 @@ h1,h2{letter-spacing:-.012em}
     if(!f) return;
     var r = new FileReader();
     r.onload = function(){ var o; try { o = JSON.parse(r.result); } catch(e){ return fail('파일을 읽을 수 없습니다. 노트북 프로그램이 만든 모바일_현황.json 파일인지 확인하세요.'); }
-      if(!valid(o)) return fail('모바일_현황.json 형식이 아닙니다. 아이클라우드 업무 폴더 맨 위에 있는 파일을 선택하세요.');
+      if(!valid(o)) return fail('모바일_현황.json 형식이 아닙니다. 구글 드라이브 업무 폴더 맨 위에 있는 파일을 선택하세요.');
       load(o, false); };
     r.onerror = function(){ fail('파일을 열지 못했습니다. 다시 선택해 주세요.'); };
     r.readAsText(f);
@@ -385,9 +385,8 @@ h1,h2{letter-spacing:-.012em}
     h += part('다음 할 일', c.nextAll);
     if(c.ups && c.ups.length) h += '<h3>진행 기록</h3><ul>' + c.ups.slice().reverse().map(function(u){ return '<li><span class="u">' + esc((u.at || '').slice(5).replace('-', '/')) + '</span>' + esc(u.t) + '</li>'; }).join('') + '</ul>';
     if(c.nts && c.nts.length) h += '<h3>첨언</h3><ul>' + c.nts.slice().reverse().map(function(u){ return '<li><span class="u">' + esc((u.at || '').slice(5).replace('-', '/')) + '</span>' + esc(u.t) + '</li>'; }).join('') + '</ul>';
-    if(c.fd) h += '<h3>iCloud 파일 위치</h3><p class="fpath">SLB 폴더 › ' + esc(c.fd.split('/').join(' › ')) + '</p>' + ((c.fl && c.fl.length) || c.fr ? '<ul class="fl">' + (c.fr ? '<li><a class="fo" href="' + esc(filesUrl(c.fd + '/결과물/' + c.fr)) + '">결과물/' + esc(c.fr) + '</a></li>' : '') + (c.fl || []).map(function(n){ return '<li><a class="fo" href="' + esc(filesUrl(c.fd + '/자료/' + n)) + '">자료/' + esc(n) + '</a></li>'; }).join('') + '</ul>' : '') +
-      '<p style="margin:6px 0 0"><a class="fo fob" href="' + esc(filesUrl(c.fd)) + '">이 업무 폴더를 파일 앱에서 열기</a></p>' +
-      '<p class="note" style="margin:4px 0 0">파일 이름을 누르면 iPhone 파일 앱에서 바로 엽니다(애플 공식 기능이 아닌 방식이라 안 열리면 위쪽 "파일 열기"로 고르세요). 기준 폴더: iCloud Drive › ' + esc(icRoot()) + ' <button class="lnk" data-root="1">바꾸기</button></p>';
+    if(c.fd) h += '<h3>파일 위치</h3><p class="fpath">SLB 폴더 › ' + esc(c.fd.split('/').join(' › ')) + '</p>' + ((c.fl && c.fl.length) || c.fr ? '<ul class="fl">' + (c.fr ? '<li>결과물/' + esc(c.fr) + '</li>' : '') + (c.fl || []).map(function(n){ return '<li>자료/' + esc(n) + '</li>'; }).join('') + '</ul>' : '') +
+      '<p class="note" style="margin:4px 0 0">구글 드라이브의 위 폴더에서 파일을 찾으세요.</p>';
     if(c.dr) h = '<p class="note" style="margin:0 0 6px">완료 승인을 기다리는 업무입니다. 승인은 노트북 프로그램에서 합니다.</p>' + h;
     if(c.done) h += part(c.rw && c.rw.length && c.stage !== 'done' ? '이전 완료 내용' : '완료 내용', c.done.sum) + part('전달 대상', c.done.to) + part('비고', c.done.notes);
     if(c.rw && c.rw.length) h += '<h3>재작업 이력 (' + (c.rwn || c.rw.length) + '회)</h3><ul>' + c.rw.slice().reverse().map(function(u){ return '<li><span class="u">' + esc((u.at || '').slice(5).replace('-', '/')) + '</span>[' + esc(u.k || '') + '] ' + esc(u.t) + (u.prev ? ' <span class="u">· 이전 완료 ' + esc(u.prev.slice(5).replace('-', '/')) + '</span>' : '') + '</li>'; }).join('') + '</ul>';
@@ -769,7 +768,7 @@ h1,h2{letter-spacing:-.012em}
     if(!D){
       top.hidden = true; stamp.hidden = true; $('tabs').hidden = true; $('reload').hidden = true; $('openf').hidden = true; document.body.classList.add('nodata'); $('pane').innerHTML = '';
       main.innerHTML = '<section class="hero"><h2>업무 현황 파일을 불러오세요</h2><p>이 화면은 조회 전용입니다. 노트북 프로그램이 저장한 파일을 이 기기 안에서만 읽어서 보여 주며, 어디로도 전송하지 않습니다.</p>' +
-        '<ol><li>파일 앱에서 <b>iCloud Drive</b>의 업무 폴더를 엽니다.</li><li>맨 위의 <b>모바일_현황.json</b>을 선택합니다.</li></ol>' +
+        '<ol><li>파일 앱에서 <b>Drive</b>(구글 드라이브)의 업무 폴더를 엽니다.</li><li>맨 위의 <b>모바일_현황.json</b>을 선택합니다.</li></ol>' +
         '<button class="btn" id="pick">파일 선택</button> <button class="btn alt" id="demo">예시로 둘러보기</button><div class="err" id="err" role="alert"></div></section>' +
         '<p class="note">불러온 내용은 이 기기의 브라우저에만 저장됩니다. 노트북에서 업무를 고친 뒤에는 파일을 다시 불러오세요.</p>';
       $('pick').onclick = pick; $('demo').onclick = function(){ load(sampleData(), true); };
